@@ -1,0 +1,95 @@
+<div class="bg-white p-6 rounded-md shadow-md">
+    <div class="flex justify-between mb-4 w-full">
+      <input
+        type="text"
+        placeholder="Search products..."
+        [(ngModel)]="searchQuery"
+        (input)="searchProducts()"
+        class="border border-gray-300 rounded-md px-4 py-2 w-1/3"
+      />
+    </div>
+
+
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white">
+        <thead>
+            <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal text-center">
+              <th class="py-3 px-6">Image</th>
+              <th class="py-3 px-6">Name</th>
+              <th class="py-3 px-6">Description</th>
+              <th class="py-3 px-6">Price</th>
+              <th class="py-3 px-6">Stock</th>
+              <th class="py-3 px-6">Category</th>
+              <th class="py-3 px-6">Supplier</th> 
+              <th class="py-3 px-6">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="text-gray-600 text-base font-light text-center">
+            <tr *ngFor="let product of paginatedProducts" class="border-b border-gray-200 hover:bg-gray-100">
+              <td class="py-3 px-6">
+                <img [src]="product.imageURL" alt="Product Image" class="h-10 w-10 object-cover rounded-full mx-auto">
+              </td>
+              <td class="py-3 px-6">{{ product.name }}</td>
+              <td class="py-3 px-6">{{ product.description }}</td>
+              <td class="py-3 px-6">{{ product.price | currency }}</td>
+              <td class="py-3 px-6">{{ product.stock }}</td>
+              <td class="py-3 px-6">{{ product.category.name }}</td>
+              <td class="py-3 px-6">{{ product.supplier?.username || 'N/A' }}</td>
+              
+                <td class="py-3 px-6 text-center space-x-2">
+
+                    <ng-container *ngIf="!product.isValidByAdmin; else validatedBlock">
+                        <button (click)="validateProduct(product)" class="hover:text-green-600 text-green-500 p-2 rounded-md" title="Validate Product">
+                          <i class="fas fa-check text-xl"></i>
+                        </button>
+                      </ng-container>
+                      <ng-template #validatedBlock>
+                        <span class="text-xs text-gray-700 italic bg-green-100 p-1  rounded-xl">Validated</span>
+                      </ng-template>
+                      
+                      
+                  <button (click)="deleteProduct(product.id)" class="hover:text-red-600 text-red-500 p-2 rounded-md">
+                    <i class="fas fa-trash-alt text-xl"></i> <!-- Delete icon -->
+                  </button>
+                  
+                   </td>
+              
+            </tr>
+          </tbody>
+          
+      </table>
+    </div>
+  
+ 
+    <!-- Pagination Controls -->
+    <div class="flex justify-center mt-6 space-x-2">
+      <button 
+        (click)="prevPage()" 
+        [disabled]="currentPage === 1"
+        class="px-3 py-1 rounded-md bg-gray-300 hover:bg-gray-400 disabled:opacity-50"
+      >
+        Prev
+      </button>
+  
+      <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+        <button
+          (click)="goToPage(i + 1)"
+          [class.bg-blue-500]="currentPage === (i + 1)"
+          [class.text-white]="currentPage === (i + 1)"
+          class="px-3 py-1 rounded-md bg-gray-300 hover:bg-gray-400"
+        >
+          {{ i + 1 }}
+        </button>
+      </ng-container>
+  
+      <button 
+        (click)="nextPage()" 
+        [disabled]="currentPage === totalPages"
+        class="px-3 py-1 rounded-md bg-gray-300 hover:bg-gray-400 disabled:opacity-50"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+  

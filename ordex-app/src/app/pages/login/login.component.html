@@ -1,0 +1,32 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-lg">
+      <h2 class="text-3xl font-bold text-center text-orange-500 mb-6">Login to Ordex</h2>
+  
+      <!-- Connect FormGroup here -->
+      <form [formGroup]="loginForm" (ngSubmit)="handleLogin()" class="space-y-5">
+        <div>
+          <label for="username" class="block text-gray-700 font-semibold mb-1">Username</label>
+          <input type="text" id="username" formControlName="username"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-400 focus:outline-none" />
+        </div>
+  
+        <div>
+          <label for="password" class="block text-gray-700 font-semibold mb-1">Password</label>
+          <input type="password" id="password" formControlName="password"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-400 focus:outline-none" />
+        </div>
+  
+        <button type="submit"
+          class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded-lg transition">
+          Login
+        </button>
+
+      </form>
+  
+      <p class="text-center text-gray-600 mt-6">
+        Don't have an account?
+        <a routerLink="/register" class="text-orange-500 font-semibold hover:underline">Register</a>
+      </p>
+    </div>
+  </div>
+  

@@ -22,7 +22,7 @@ export class MainComponent implements OnInit {
   }
 
   showDropdown = false;
-  
+
   loadProducts(): void {
     this.productService.getValidProducts().subscribe({
       next: (data: Product[]) => {
@@ -33,7 +33,7 @@ export class MainComponent implements OnInit {
       }
     });
   }
-  
+
 
   handleAddToCart(product: Product): void {
     if (this.authService.isUserAuthenticated()) {
@@ -43,6 +43,6 @@ export class MainComponent implements OnInit {
       this.router.navigate(['/login']);
     }
   }
-  
+
 
 }

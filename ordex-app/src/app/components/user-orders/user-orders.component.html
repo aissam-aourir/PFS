@@ -1,0 +1,96 @@
+<div class="p-6 bg-white shadow-md rounded-2xl max-w-7xl mx-auto">
+  <h2 class="text-2xl font-bold mb-6">Mes Commandes</h2>
+
+  <table class="min-w-full text-sm text-gray-600">
+    <thead class="text-xs text-center text-gray-700 uppercase bg-gray-100">
+    <tr>
+      <th class="px-4 py-3">ID Commande</th>
+      <th class="px-4 py-3">Total</th>
+      <th class="px-4 py-3">Méthode de Paiement</th>
+      <th class="px-4 py-3">Statut</th>
+      <th class="px-4 py-3">Date</th>
+      <th class="px-4 py-3">Détails</th>
+    </tr>
+    </thead>
+    <tbody>
+    <ng-container *ngFor="let order of paginatedOrders">
+      <tr class="bg-white border-b text-center hover:bg-gray-50">
+        <td class="px-4 py-3">{{ order.id }}</td>
+        <td class="px-4 py-3">{{ order.total.toFixed(2) }} €</td>
+        <td class="px-4 py-3 capitalize">{{ order.paymentMethod }}</td>
+        <td class="px-4 py-3">
+            <span [ngClass]="getStatusClass(order.status)" class="px-3 py-1 rounded-full text-xs font-semibold">
+              {{ order.status }}
+            </span>
+        </td>
+        <td class="px-4 py-3">{{ order.createdAt | date:'short' }}</td>
+        <td class="px-4 py-3">
+          <button
+            class="text-indigo-600 hover:underline"
+            (click)="selectedOrder === order ? selectedOrder = null : viewProducts(order)">
+            <i class="fas fa-eye text-lg"></i>
+          </button>
+        </td>
+      </tr>
+
+      <!-- Ligne des détails du produit -->
+      <tr *ngIf="selectedOrder === order" class="bg-gray-50 border-t">
+        <td colspan="6" class="px-6 py-4">
+          <div class="space-y-4">
+            <h4 class="text-lg font-semibold">Produits dans la commande #{{ order.id }}</h4>
+            <div class="flex items-center justify-between p-3 bg-indigo-50 border border-indigo-200 rounded-lg shadow-sm">
+              <span class="text-sm font-semibold text-indigo-800">Total :</span>
+              <span class="text-lg font-bold text-indigo-600">{{ order.total.toFixed(2) }} €</span>
+            </div>
+            <div class="grid gap-4">
+              <div
+                *ngFor="let op of order.orderProducts"
+                class="flex justify-between items-center p-4 border rounded-lg bg-white shadow-sm"
+              >
+                <div>
+                  <h5 class="font-bold">{{ op.product.name }}</h5>
+                  <p class="text-gray-500 text-sm">{{ op.product.description }}</p>
+                </div>
+                <div class="text-right text-sm">
+                  <p>Quantité : <span class="font-semibold">{{ op.quantity }}</span></p>
+                  <p>Prix : {{ op.priceAtPurchases.toFixed(2) }} €</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </ng-container>
+    </tbody>
+  </table>
+
+  <!-- Contrôles de pagination -->
+  <div class="flex justify-center mt-6 space-x-2">
+    <button
+      (click)="prevPage()"
+      [disabled]="currentPage === 1"
+      class="px-3 py-1 rounded-md bg-gray-300 hover:bg-gray-400 disabled:opacity-50"
+    >
+      Précédent
+    </button>
+
+    <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+      <button
+        (click)="goToPage(i + 1)"
+        [class.bg-blue-500]="currentPage === (i + 1)"
+        [class.text-white]="currentPage === (i + 1)"
+        class="px-3 py-1 rounded-md bg-gray-300 hover:bg-gray-400"
+      >
+        {{ i + 1 }}
+      </button>
+    </ng-container>
+
+    <button
+      (click)="nextPage()"
+      [disabled]="currentPage === totalPages"
+      class="px-3 py-1 rounded-md bg-gray-300 hover:bg-gray-400 disabled:opacity-50"
+    >
+      Suivant
+    </button>
+  </div>
+</div>

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ProductService } from '../../services/product.service'; // Import ProductService
-import { ToastrService } from 'ngx-toastr'; // Import ToastrService
+import { ProductService } from '../../services/product.service';
+import { ToastrService } from 'ngx-toastr';
 import { Product } from '../../models/product';
 import { Category } from '../../models/category';
 import { CommonModule } from '@angular/common';
@@ -8,8 +8,8 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-admin-products',
-  standalone:true,
-  imports:[CommonModule,FormsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './admin-products.component.html',
 })
 export class AdminProductsComponent implements OnInit {
@@ -17,7 +17,11 @@ export class AdminProductsComponent implements OnInit {
   categories: Category[] = [];
   currentPage = 1;
   itemsPerPage = 6;
-  searchQuery = ''; // Add searchQuery variable
+  searchName: string = '';
+  searchPrice: number | '' = '';
+  searchCategory: string = '';
+  searchSupplier: string = '';
+  searchStock: number | '' = '';
 
   constructor(
     private productService: ProductService,
@@ -32,6 +36,7 @@ export class AdminProductsComponent implements OnInit {
     this.productService.getAll().subscribe({
       next: (data) => {
         this.products = data;
+        this.searchProducts(); // Trigger search to initialize filtered products
       },
       error: (err) => {
         console.error('Error loading products', err);
@@ -39,16 +44,31 @@ export class AdminProductsComponent implements OnInit {
     });
   }
 
-  // Implement search logic
   searchProducts(): void {
     this.currentPage = 1; // Reset to the first page when searching
   }
 
   get paginatedProducts(): Product[] {
-    // Filter the products based on the search query
-    const filteredProducts = this.products.filter(product =>
-      product.name.toLowerCase().includes(this.searchQuery.toLowerCase()) // Case-insensitive search by product name
-    );
+    // Filter products based on the search criteria
+    let filteredProducts = this.products;
+
+    if (this.searchName || this.searchPrice !== '' || this.searchCategory || this.searchSupplier || this.searchStock !== '') {
+      filteredProducts = this.products.filter(product => {
+        const nameSearch = this.searchName.toLowerCase().trim();
+        const priceSearch = this.searchPrice;
+        const categorySearch = this.searchCategory.toLowerCase().trim();
+        const supplierSearch = this.searchSupplier.toLowerCase().trim();
+        const stockSearch = this.searchStock;
+
+        const matchesName = !nameSearch || product.name?.toLowerCase().includes(nameSearch) || false;
+        const matchesPrice = priceSearch === '' || (typeof priceSearch === 'number' && product.price === priceSearch) || false;
+        const matchesCategory = !categorySearch || product.category?.name?.toLowerCase().includes(categorySearch) || false;
+        const matchesSupplier = !supplierSearch || (product.supplier?.username?.toLowerCase() || 'N/A').includes(supplierSearch) || false;
+        const matchesStock = stockSearch === '' || (typeof stockSearch === 'number' && product.stock === stockSearch) || false;
+
+        return matchesName && matchesPrice && matchesCategory && matchesSupplier && matchesStock;
+      });
+    }
 
     // Paginate the filtered products
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
@@ -56,23 +76,43 @@ export class AdminProductsComponent implements OnInit {
   }
 
   get totalPages(): number {
-    const filteredProducts = this.products.filter(product =>
-      product.name.toLowerCase().includes(this.searchQuery.toLowerCase()) // Case-insensitive search
-    );
+    // Calculate total pages based on filtered products
+    let filteredProducts = this.products;
+
+    if (this.searchName || this.searchPrice !== '' || this.searchCategory || this.searchSupplier || this.searchStock !== '') {
+      filteredProducts = this.products.filter(product => {
+        const nameSearch = this.searchName.toLowerCase().trim();
+        const priceSearch = this.searchPrice;
+        const categorySearch = this.searchCategory.toLowerCase().trim();
+        const supplierSearch = this.searchSupplier.toLowerCase().trim();
+        const stockSearch = this.searchStock;
+
+        const matchesName = !nameSearch || product.name?.toLowerCase().includes(nameSearch) || false;
+        const matchesPrice = priceSearch === '' || (typeof priceSearch === 'number' && product.price === priceSearch) || false;
+        const matchesCategory = !categorySearch || product.category?.name?.toLowerCase().includes(categorySearch) || false;
+        const matchesSupplier = !supplierSearch || (product.supplier?.username?.toLowerCase() || 'N/A').includes(supplierSearch) || false;
+        const matchesStock = stockSearch === '' || (typeof stockSearch === 'number' && product.stock === stockSearch) || false;
+
+        return matchesName && matchesPrice && matchesCategory && matchesSupplier && matchesStock;
+      });
+    }
+
     return Math.ceil(filteredProducts.length / this.itemsPerPage);
   }
 
-  goToPage(page: number) {
-    this.currentPage = page;
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
   }
 
-  nextPage() {
+  nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
     }
   }
 
-  prevPage() {
+  prevPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
     }
@@ -129,5 +169,15 @@ export class AdminProductsComponent implements OnInit {
         console.error('Error deleting product', err);
       }
     });
+  }
+
+  resetSearch(): void {
+    this.searchName = '';
+    this.searchPrice = '';
+    this.searchCategory = '';
+    this.searchSupplier = '';
+    this.searchStock = '';
+    this.currentPage = 1;
+    this.searchProducts(); // Trigger search to reset filtered products
   }
 }

@@ -1,10 +1,11 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
-
+import { MdpOublieComponent} from'./pages/mdpoublie/mdp-oublie.component';
 import { HomeComponent } from './pages/home/home.component';
 import { MainComponent } from './pages/home/main/main.component';
 import { ProductsPageComponent } from './pages/home/products-page/products-page.component';
+import { VerifyCodeComponent } from './pages/verify-code/verify-code.component';
 
 import { SupplierPanelComponent } from './pages/supplier-panel/supplier-panel.component';
 import { AdminPanelComponent } from './pages/admin-panel/admin-panel.component';
@@ -24,7 +25,7 @@ import { AdminProductsComponent } from './components/admin-products/admin-produc
 
 // Home routes
 const homeRoutes: Routes = [
-  { path: '', redirectTo: 'main', pathMatch: 'full' }, 
+  { path: '', redirectTo: 'main', pathMatch: 'full' },
   { path: 'main', component: MainComponent },
   { path: 'products', component: ProductsPageComponent },
   { path: 'cart', component: ShoppingCartComponent },
@@ -55,9 +56,9 @@ export const routes: Routes = [
   { path: '', redirectTo: '/home/main', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-
+  { path: 'mdpoublie', component: MdpOublieComponent },
   { path: 'home', component: HomeComponent, children: homeRoutes },
-
+  { path: 'verify-code', component: VerifyCodeComponent  },
   {
     path: 'supplier',
     component: SupplierPanelComponent,

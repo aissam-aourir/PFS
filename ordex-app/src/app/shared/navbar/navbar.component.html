@@ -6,11 +6,11 @@
         <li class="hover:text-orange-500">About Us</li>
         <li><a routerLink="/home/products" class="hover:text-orange-500">More Products</a></li>
 
-  
+
       </ul>
-      
+
      <ul class="flex space-x-6 text-gray-700 font-medium">
-       
+
       <ng-container *ngIf="authService.isUserAuthenticated() && !authService.hasRole('ADMIN') && !authService.hasRole('SUPPLIER')">
         <li class="relative cursor-pointer mt-2">
           <div routerLink="/home/cart" class="text-gray-700 hover:text-orange-500 flex items-center">
@@ -24,8 +24,8 @@
           </div>
         </li>
       </ng-container>
-      
-          
+
+
       <ul class="flex space-x-6 text-gray-700 font-medium">
         <ng-container *ngIf="authService.isUserAuthenticated() && !authService.hasRole('ADMIN') && !authService.hasRole('SUPPLIER'); else guestLinks">
             <!-- Profile dropdown (for regular users only) -->
@@ -40,7 +40,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-          
+
               <div
                 *ngIf="showDropdown"
                 class="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border z-50"
@@ -54,15 +54,15 @@
               </div>
             </div>
           </ng-container>
-          
-      
+
+
         <ng-template #guestLinks>
           <li><a routerLink="/login" class="text-orange-500 hover:underline">Login</a></li>
           <li><a routerLink="/register" class="text-orange-500 hover:underline">Register</a></li>
         </ng-template>
       </ul>
-      
-      
-      
+
+
+
     </ul>
   </nav>

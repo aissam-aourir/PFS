@@ -24,7 +24,6 @@ public class Product {
     private Integer stock;
     private String imageURL;
     private LocalDateTime createdAt;
-
     private Boolean isValidByAdmin = false;
 
     @ManyToOne

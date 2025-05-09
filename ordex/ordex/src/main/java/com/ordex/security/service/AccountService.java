@@ -6,7 +6,6 @@ import com.ordex.security.entities.Utilisateur;
 import java.util.List;
 
 public interface AccountService {
-
     Utilisateur addNewUser(String username, String password, String email);
     AppRole addNewRole(String role);
     void addRoleToUser(String username,String role);
@@ -14,4 +13,7 @@ public interface AccountService {
     Utilisateur findById(Long Id);
     List<Utilisateur> getAllSuppliers();
     List<Utilisateur> getAllClients();
+    void updatePassword(String email,String newPassword);
+    void renitiliaserPassword(String email,String tempPassword);
+    void verifyResetCode(String email,String password,String code);
 }

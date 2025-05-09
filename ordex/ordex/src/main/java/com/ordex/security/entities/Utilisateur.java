@@ -22,6 +22,7 @@ public class Utilisateur {
     private String email;
     private  LocalDateTime createdAt;
     private boolean blocked;
+    private String tem_password=null;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

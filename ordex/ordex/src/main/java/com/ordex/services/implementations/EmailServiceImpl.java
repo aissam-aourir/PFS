@@ -55,4 +55,5 @@ public class EmailServiceImpl implements EmailService {
             System.out.println("Erreur lors de l'envoi du mail : " + e.getMessage());
         }
     }
+
 }

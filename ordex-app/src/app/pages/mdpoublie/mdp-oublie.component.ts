@@ -39,8 +39,10 @@ export class MdpOublieComponent {
             titleClass: 'toast-title',
             messageClass: 'toast-message'
           });
-          // Redirection vers la page de connexion
-          this.router.navigateByUrl('/verify-code');
+          // Passer l'email via l'état de navigation
+          this.router.navigateByUrl('/verify-code', {
+            state: { email: email }
+          });
         },
         error: (error) => {
           this.toastr.error(error.error?.error || 'Échec de l\'envoi du code de réinitialisation. Veuillez réessayer.', 'Erreur', {

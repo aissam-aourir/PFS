@@ -9,13 +9,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
+
 
 @Service
 @Transactional
@@ -75,8 +74,44 @@ public  class AccountServiceImpl implements AccountService {
                 .orElseThrow(() -> new RuntimeException("Utilisateur not found with id: " + id));
     }
 
+    @Override
+    public void updatePassword(String email, String newPassword) {
+        Utilisateur user = utilisateurRepository.findByEmail(email);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        utilisateurRepository.save(user);
+    }
 
+    @Override
+    public void renitiliaserPassword(String email, String tempPassword) {
+        Utilisateur user = utilisateurRepository.findByEmail(email);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        user.setTem_password(tempPassword);
+        utilisateurRepository.save(user);
+    }
 
+    @Override
+    public void verifyResetCode(String email, String password, String code) {
+        System.out.println("Vérification pour email: " + email + ", code: " + code);
+        Utilisateur user = utilisateurRepository.findByEmail(email);
+        if (user == null) {
+            System.out.println("Utilisateur non trouvé pour email: " + email);
+            throw new RuntimeException("User not found");
+        }
+        System.out.println("Utilisateur trouvé: " + user.getUsername() + ", tem_password: " + user.getTem_password());
+        if (user.getTem_password() == null || !user.getTem_password().equals(code)) {
+            System.out.println("Code invalide. tem_password: " + user.getTem_password() + ", code fourni: " + code);
+            throw new RuntimeException("Invalid reset code");
+        }
+        System.out.println("Code valide, mise à jour du mot de passe");
+        user.setPassword(passwordEncoder.encode(password));
+        utilisateurRepository.save(user);
+        System.out.println("Mot de passe mis à jour avec succès pour: " + email);
+    }
 
     @Override
     public List<Utilisateur> getAllSuppliers() {
@@ -87,7 +122,6 @@ public  class AccountServiceImpl implements AccountService {
     public List<Utilisateur> getAllClients() {
         return getUsersByRole("CLIENT");
     }
-
 
     private List<Utilisateur> getUsersByRole(String role) {
         List<Utilisateur> users = utilisateurRepository.findAll()
@@ -102,7 +136,6 @@ public  class AccountServiceImpl implements AccountService {
 
         return reversed;
     }
-
 
     public Utilisateur blockUser(String username) {
         // Directly check if the user is null

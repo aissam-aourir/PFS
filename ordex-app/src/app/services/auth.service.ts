@@ -33,7 +33,7 @@ export class AuthService {
     this.loadFromLocalStorage();
   }
 
-  register(username: string, email: string, password: string): Observable<any> {
+  register(username:  string, email: string, password: string): Observable<any> {
     const body = { username, email, password };
     return this.httpClient.post(`${this.baseUrl}/register`, body);
   }
@@ -103,7 +103,8 @@ export class AuthService {
   }
 
   // Method for verifying reset code
-  verifyResetCode(code: string): Observable<any> {
-    return this.httpClient.post(`${this.baseUrl}/verify-code`, { code });
+  verifyResetCode(code: string, password: string, email: string): Observable<any> {
+    const body = { email, code, password }; // Envoyer email, code et password
+    return this.httpClient.post(`${this.baseUrl}/verify-code`, body);
   }
 }

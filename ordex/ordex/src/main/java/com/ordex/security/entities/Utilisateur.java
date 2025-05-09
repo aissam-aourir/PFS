@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ordex.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
-
+//importer la classe Favoris de folder security
+import lombok.experimental.SuperBuilder;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,4 +31,7 @@ public class Utilisateur {
     )
     @JsonIgnore
     private List<AppRole> roles;
+    //un user qui est un client peut avoir plusieurs favoris et un favoris peut etre appartenant a plusieurs utilisateurs
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Favoris> favoris;
 }

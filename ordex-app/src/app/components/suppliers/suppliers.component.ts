@@ -9,18 +9,18 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-suppliers',
   standalone: true,
-  imports: [CommonModule, NewSupplierModalComponent,FormsModule],
+  imports: [CommonModule, NewSupplierModalComponent, FormsModule],
   templateUrl: './suppliers.component.html',
 })
 export class SuppliersComponent implements OnInit {
   suppliers: User[] = [];
-  filteredSuppliers: User[] = []; // Stores the filtered suppliers based on search
-  
+  filteredSuppliers: User[] = [];
   isSupplierModalOpen = false;
   currentPage = 1;
   itemsPerPage = 6;
   selectedSupplier: User | null = null;
-  searchQuery: string = ''; // Holds the search query for filtering
+  searchQuery: string = '';
+  searchCriteria: string = 'username'; // Default search criteria
 
   constructor(private userService: UserService, private authService: AuthService) {}
 
@@ -33,7 +33,7 @@ export class SuppliersComponent implements OnInit {
     this.userService.getAll().subscribe({
       next: (data) => {
         this.suppliers = data;
-        this.filteredSuppliers = data; // Initialize filteredSuppliers to all suppliers initially
+        this.onSearch(); // Trigger search to initialize filteredSuppliers
       },
       error: (err) => {
         console.error('Error loading suppliers', err);
@@ -41,13 +41,32 @@ export class SuppliersComponent implements OnInit {
     });
   }
 
+  // Reset page and query when criteria changes
+  onCriteriaChange(): void {
+    this.searchQuery = ''; // Clear search query
+    this.currentPage = 1; // Reset to first page
+    this.onSearch();
+  }
+
   // Handle search input and filter suppliers
   onSearch(): void {
     const query = this.searchQuery.toLowerCase();
-    this.filteredSuppliers = this.suppliers.filter(supplier =>
-      supplier.username.toLowerCase().includes(query) ||
-      supplier.email.toLowerCase().includes(query)
-    );
+    this.filteredSuppliers = this.suppliers.filter(supplier => {
+      switch (this.searchCriteria) {
+        case 'username':
+          return supplier.username.toLowerCase().includes(query);
+        case 'email':
+          return supplier.email.toLowerCase().includes(query);
+        case 'createdAt':
+          return supplier.createdAt
+            ? new Date(supplier.createdAt).toLocaleString().toLowerCase().includes(query)
+            : false;
+        case 'blocked':
+          return supplier.blocked !== undefined && supplier.blocked === true;
+        default:
+          return true;
+      }
+    });
     this.currentPage = 1; // Reset to the first page when searching
   }
 
@@ -71,7 +90,7 @@ export class SuppliersComponent implements OnInit {
       error: (err) => {
         const errorMessage = err.error?.error || 'An unknown error occurred.';
         console.error('Error adding supplier:', errorMessage);
-        alert(errorMessage); // or show it in a toast/snackbar/UI
+        alert(errorMessage);
       }
     });
   }
@@ -88,21 +107,20 @@ export class SuppliersComponent implements OnInit {
     });
   }
 
-   // Example actions (implement later if needed)
-   approveSupplier(id: number): void {
+  // Approve supplier
+  approveSupplier(id: number): void {
     console.log('Approved supplier with ID:', id);
   }
-
 
   toggleBlockStatus(supplier: User): void {
     const action = supplier.blocked ? 'unblock' : 'block';
     const confirmed = confirm(`Are you sure you want to ${action} "${supplier.username}"?`);
     if (!confirmed) return;
-  
+
     const request = supplier.blocked
       ? this.userService.unblockUser(supplier.username)
       : this.userService.blockUser(supplier.username);
-  
+
     request.subscribe({
       next: () => {
         supplier.blocked = !supplier.blocked;
@@ -114,12 +132,7 @@ export class SuppliersComponent implements OnInit {
       }
     });
   }
-  
-  
 
-  
-  
-   
   // Pagination logic
   get paginatedSuppliers(): User[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;

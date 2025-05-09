@@ -74,6 +74,6 @@ export class ShoppingCartComponent implements OnInit {
       this.cartService.setCartItems(this.cart);
     }
   }
-  
-  
+
+
 }

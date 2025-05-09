@@ -10,8 +10,9 @@ interface JwtPayload {
   iat: number;
   exp: number;
   userId: string;
-  email: string; 
+  email: string;
 }
+
 @Injectable({
   providedIn: 'root'
 })
@@ -19,7 +20,7 @@ export class AuthService {
 
   isAuthenticated: boolean = false;
   username: any;
-  email:any;
+  email: any;
   roles: any;
   accessToken!: string;
   userId: string | null = null; // Store userId here
@@ -28,7 +29,7 @@ export class AuthService {
 
   private baseUrl = 'http://localhost:8080/auth';
 
-  constructor(private httpClient: HttpClient, private router: Router) { 
+  constructor(private httpClient: HttpClient, private router: Router) {
     this.loadFromLocalStorage();
   }
 
@@ -48,7 +49,7 @@ export class AuthService {
     this.isAuthenticated = true;
     this.accessToken = data['access-token'];
     localStorage.setItem('access-token', this.accessToken); // Store token in localStorage
-    const decodedJwt = this.jwtHelper.decodeToken<JwtPayload>(this.accessToken); 
+    const decodedJwt = this.jwtHelper.decodeToken<JwtPayload>(this.accessToken);
     this.username = decodedJwt?.sub;
     this.email = decodedJwt?.email || null;
     this.roles = decodedJwt?.authorities || [];
@@ -72,7 +73,7 @@ export class AuthService {
     const token = localStorage.getItem('access-token');
     if (token && !this.jwtHelper.isTokenExpired(token)) {
       this.accessToken = token;
-      return this.accessToken;      
+      return this.accessToken;
     }
     return null;
   }
@@ -94,5 +95,15 @@ export class AuthService {
 
   hasRole(role: string): boolean {
     return this.roles?.includes(role);
+  }
+
+  // Method for requesting password reset
+  requestPasswordReset(email: string): Observable<any> {
+    return this.httpClient.post(`${this.baseUrl}/forgot-password`, { email });
+  }
+
+  // Method for verifying reset code
+  verifyResetCode(code: string): Observable<any> {
+    return this.httpClient.post(`${this.baseUrl}/verify-code`, { code });
   }
 }

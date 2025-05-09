@@ -8,7 +8,7 @@ export interface Order {
   total: number;
   status: string;
   phone:string;
-  createdAt: string; 
+  createdAt: string;
   paymentMethod: string;
   client: { username: string };
   orderProducts: OrderProduct[];

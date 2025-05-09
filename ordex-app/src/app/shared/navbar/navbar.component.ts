@@ -21,7 +21,7 @@ export class NavbarComponent implements OnInit {
     this.cartService.cartCount$.subscribe(count => {
       this.cartItemCount = count;
     });
-  
+
     // Load from local storage on first init
     this.updateCartItemCount();
   }
@@ -32,7 +32,7 @@ export class NavbarComponent implements OnInit {
       const cartKey = `cart-${username}`;
       const storedCart = localStorage.getItem(cartKey);
       const cart: Product[] = storedCart ? JSON.parse(storedCart) : [];
-  
+
       this.cartItemCount = cart.reduce((count, product) => count + (product.quantity || 0), 0);
       this.cartService.setCartItems(cart); // 🟡 keep sync
     }

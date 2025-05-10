@@ -5,7 +5,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { Observable } from 'rxjs';
 
 interface JwtPayload {
-  sub: string; // Typically the username
+  sub: string;
   authorities: string[];
   iat: number;
   exp: number;
@@ -23,19 +23,28 @@ export class AuthService {
   email: any;
   roles: any;
   accessToken!: string;
-  userId: string | null = null; // Store userId here
+  userId: string | null = null;
 
   private jwtHelper = new JwtHelperService();
-
   private baseUrl = 'http://localhost:8080/auth';
 
   constructor(private httpClient: HttpClient, private router: Router) {
     this.loadFromLocalStorage();
   }
 
-  register(username:  string, email: string, password: string): Observable<any> {
+  register(username: string, email: string, password: string): Observable<any> {
     const body = { username, email, password };
     return this.httpClient.post(`${this.baseUrl}/register`, body);
+  }
+
+  verifyRegister(username: string, email: string, password: string): Observable<any> {
+    const body = { username, email, password };
+    return this.httpClient.post(`${this.baseUrl}/verifyregister`, body);
+  }
+
+  verifyRegisterCode(email: string, code: string, username: string, password: string): Observable<any> {
+    const body = { email, code, username, password };
+    return this.httpClient.post(`${this.baseUrl}/verify-register-code`, body);
   }
 
   login(username: string, password: string): Observable<any> {
@@ -48,12 +57,12 @@ export class AuthService {
   loadProfile(data: any): void {
     this.isAuthenticated = true;
     this.accessToken = data['access-token'];
-    localStorage.setItem('access-token', this.accessToken); // Store token in localStorage
+    localStorage.setItem('access-token', this.accessToken);
     const decodedJwt = this.jwtHelper.decodeToken<JwtPayload>(this.accessToken);
     this.username = decodedJwt?.sub;
     this.email = decodedJwt?.email || null;
     this.roles = decodedJwt?.authorities || [];
-    this.userId = decodedJwt?.userId || null; // Store userId from JWT
+    this.userId = decodedJwt?.userId || null;
   }
 
   loadFromLocalStorage(): void {
@@ -64,7 +73,7 @@ export class AuthService {
       this.username = decodedJwt?.sub;
       this.email = decodedJwt?.email || null;
       this.roles = decodedJwt?.authorities || [];
-      this.userId = decodedJwt?.userId || null; // Retrieve userId from localStorage
+      this.userId = decodedJwt?.userId || null;
       this.isAuthenticated = true;
     }
   }
@@ -86,10 +95,10 @@ export class AuthService {
     this.isAuthenticated = false;
     this.username = null;
     this.roles = null;
-    this.userId = null; // Reset userId
+    this.userId = null;
     this.email = null;
     this.accessToken = '';
-    localStorage.removeItem('access-token'); // Clear token on logout
+    localStorage.removeItem('access-token');
     this.router.navigate(['/login']);
   }
 
@@ -97,14 +106,16 @@ export class AuthService {
     return this.roles?.includes(role);
   }
 
-  // Method for requesting password reset
   requestPasswordReset(email: string): Observable<any> {
     return this.httpClient.post(`${this.baseUrl}/forgot-password`, { email });
   }
 
-  // Method for verifying reset code
   verifyResetCode(code: string, password: string, email: string): Observable<any> {
-    const body = { email, code, password }; // Envoyer email, code et password
+    const body = { email, code, password };
     return this.httpClient.post(`${this.baseUrl}/verify-code`, body);
+  }
+
+  requestRegisterCode(email: string): Observable<any> {
+    return this.httpClient.post(`${this.baseUrl}/verify-register`, { email });
   }
 }

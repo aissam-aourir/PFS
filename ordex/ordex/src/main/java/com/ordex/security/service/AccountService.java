@@ -16,4 +16,7 @@ public interface AccountService {
     void updatePassword(String email,String newPassword);
     void renitiliaserPassword(String email,String tempPassword);
     void verifyResetCode(String email,String password,String code);
+    boolean verifyExistenceOfUsername(String username);
+    void saveTempUser(String username, String email, String password, String verificationCode);
+    Utilisateur verifyRegisterCode(String email, String code, String username, String password);
 }

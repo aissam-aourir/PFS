@@ -6,6 +6,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { MainComponent } from './pages/home/main/main.component';
 import { ProductsPageComponent } from './pages/home/products-page/products-page.component';
 import { VerifyCodeComponent } from './pages/verify-code/verify-code.component';
+import { VerifyRegisterComponent } from './pages/verify-register/verify-register.component';
 
 import { SupplierPanelComponent } from './pages/supplier-panel/supplier-panel.component';
 import { AdminPanelComponent } from './pages/admin-panel/admin-panel.component';
@@ -59,6 +60,7 @@ export const routes: Routes = [
   { path: 'mdpoublie', component: MdpOublieComponent },
   { path: 'home', component: HomeComponent, children: homeRoutes },
   { path: 'verify-code', component: VerifyCodeComponent  },
+  { path: 'verifyregister', component: VerifyRegisterComponent },
   {
     path: 'supplier',
     component: SupplierPanelComponent,

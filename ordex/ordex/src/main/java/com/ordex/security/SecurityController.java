@@ -1,4 +1,5 @@
 package com.ordex.security;
+
 import com.ordex.helpers.LoginRequest;
 import com.ordex.helpers.RegisterRequest;
 import com.ordex.security.entities.Utilisateur;
@@ -13,9 +14,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.HashMap;
-import java.util.Random;
 import java.util.Map;
+import java.util.Random;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -30,32 +32,25 @@ public class SecurityController {
     @Autowired
     private EmailServiceImpl emailService;
 
-    @PostMapping("/forgot-password")//postmaping nous permet de s eredidriger ed front vers le backend plus precisement vers cette methode, on fait metter ce mapping dans le URL
+    @PostMapping("/forgot-password")
     public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody Map<String, String> request) {
         String email = request.get("email");
-        System.out.println("email saisi : " + email);
         if (email == null || email.isEmpty()) {
             Map<String, String> response = new HashMap<>();
             response.put("error", "Email requis");
             return ResponseEntity.badRequest().body(response);
         }
 
-        // Générer un code de réinitialisation (6 chiffres)
         String resetCode = String.format("%06d", new Random().nextInt(999999));
-        System.out.println("Code de réinitialisation généré : " + resetCode);
         try {
-            System.out.println("Envoi de l'email à : " + email);
             emailService.sendResetCode(email, resetCode);
-            //cette requete de emailService.sendResetCode(email, resetCode); ne s'execute pas
             Map<String, String> response = new HashMap<>();
             response.put("message", "Code de réinitialisation envoyé");
-            System.out.println("Email envoyé avec succès à : " + email);
             this.accountService.renitiliaserPassword(email, resetCode);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, String> response = new HashMap<>();
             response.put("error", "Échec de l'envoi de l'email : " + e.getMessage());
-            System.out.println("Erreur lors de l'envoi de l'email : ");
             return ResponseEntity.status(500).body(response);
         }
     }
@@ -83,8 +78,9 @@ public class SecurityController {
     }
 
     @GetMapping("/profile")
-    public Authentication authentication (Authentication authentication){
-        return authentication;}
+    public Authentication authentication(Authentication authentication) {
+        return authentication;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
@@ -95,7 +91,6 @@ public class SecurityController {
 
             Utilisateur user = accountService.loadUserByUsername(loginRequest.getUsername());
 
-            // Check if the user is blocked
             if (user.isBlocked()) {
                 return ResponseEntity.status(403).body(Map.of("error", "User is blocked"));
             }
@@ -127,6 +122,54 @@ public class SecurityController {
         }
     }
 
+    @PostMapping("/verifyregister")
+    public ResponseEntity<?> verifyregister(@RequestBody RegisterRequest request) {
+        if (this.accountService.verifyExistenceOfUsername(request.getUsername())) {
+            throw new RuntimeException("Cet utilisateur existe déjà");
+        } else {
+            try {
+                String email = request.getEmail();
+                String resetCode = String.format("%06d", new Random().nextInt(999999));
+                emailService.sendVerificationCode(email, resetCode);
+                this.accountService.saveTempUser(request.getUsername(), request.getEmail(), request.getPassword(), resetCode);
+                Map<String, String> response = new HashMap<>();
+                response.put("message", "Code de vérification envoyé");
+                return ResponseEntity.ok(response);
+            } catch (Exception e) {
+                Map<String, String> response = new HashMap<>();
+                response.put("error", "Échec de l'envoi de l'email : " + e.getMessage());
+                return ResponseEntity.status(500).body(response);
+            }
+        }
+    }
+
+    @PostMapping("/verify-register-code")
+    public ResponseEntity<?> verifyRegisterCode(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String code = request.get("code");
+        String username = request.get("username");
+        String password = request.get("password");
+        if (email == null || code == null || username == null || password == null) {
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "Email, code, nom d'utilisateur et mot de passe requis");
+            return ResponseEntity.badRequest().body(response);
+        }
+        try {
+            Utilisateur user = this.accountService.verifyRegisterCode(email, code, username, password);
+            accountService.addRoleToUser(user.getUsername(), "CLIENT");
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(user.getUsername(), password));
+            String jwt = jwtService.generateToken(authentication, user);
+            emailService.sendVerificationInscription(email);
+            System.out.println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+            return ResponseEntity.ok(Map.of("access-token", jwt));
+        } catch (RuntimeException e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
     @PutMapping("/block/{username}")
     public ResponseEntity<?> blockUser(@PathVariable String username) {
         try {
@@ -143,14 +186,7 @@ public class SecurityController {
             Utilisateur unblockedUser = accountService.unblockUser(username);
             return ResponseEntity.ok(Map.of("message", "User unblocked successfully"));
         } catch (RuntimeException e) {
-//            System.out.println("Message is "+e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
-
-
-
-
-
-
 }

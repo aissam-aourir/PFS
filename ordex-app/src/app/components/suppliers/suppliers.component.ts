@@ -19,8 +19,15 @@ export class SuppliersComponent implements OnInit {
   currentPage = 1;
   itemsPerPage = 6;
   selectedSupplier: User | null = null;
-  searchQuery: string = '';
-  searchCriteria: string = 'username'; // Default search criteria
+
+  // Filtres
+  filterUsername: string = '';
+  filterEmail: string = '';
+  filterStartDate: string = '';
+  filterEndDate: string = '';
+  filterBlocked: string = 'all'; // 'all', 'blocked', 'unblocked'
+  sortBy: string = 'username'; // 'username', 'createdAt'
+  sortOrder: string = 'asc'; // 'asc', 'desc'
 
   constructor(private userService: UserService, private authService: AuthService) {}
 
@@ -28,93 +35,135 @@ export class SuppliersComponent implements OnInit {
     this.loadSuppliers();
   }
 
-  // Load suppliers from the backend
+  // Charger les fournisseurs depuis le backend
   loadSuppliers(): void {
     this.userService.getAll().subscribe({
       next: (data) => {
         this.suppliers = data;
-        this.onSearch(); // Trigger search to initialize filteredSuppliers
+        this.applyFilters();
       },
       error: (err) => {
-        console.error('Error loading suppliers', err);
+        console.error('Erreur lors du chargement des fournisseurs', err);
       }
     });
   }
 
-  // Reset page and query when criteria changes
-  onCriteriaChange(): void {
-    this.searchQuery = ''; // Clear search query
-    this.currentPage = 1; // Reset to first page
-    this.onSearch();
-  }
+  // Appliquer les filtres et le tri
+  applyFilters(): void {
+    let result = [...this.suppliers];
 
-  // Handle search input and filter suppliers
-  onSearch(): void {
-    const query = this.searchQuery.toLowerCase();
-    this.filteredSuppliers = this.suppliers.filter(supplier => {
-      switch (this.searchCriteria) {
-        case 'username':
-          return supplier.username.toLowerCase().includes(query);
-        case 'email':
-          return supplier.email.toLowerCase().includes(query);
-        case 'createdAt':
-          return supplier.createdAt
-            ? new Date(supplier.createdAt).toLocaleString().toLowerCase().includes(query)
-            : false;
-        case 'blocked':
-          return supplier.blocked !== undefined && supplier.blocked === true;
-        default:
-          return true;
+    // Filtre par username
+    if (this.filterUsername.trim()) {
+      result = result.filter(supplier =>
+        supplier.username.toLowerCase().includes(this.filterUsername.toLowerCase())
+      );
+    }
+
+    // Filtre par email
+    if (this.filterEmail.trim()) {
+      result = result.filter(supplier =>
+        supplier.email.toLowerCase().includes(this.filterEmail.toLowerCase())
+      );
+    }
+
+    // Filtre par plage de dates
+    if (this.filterStartDate) {
+      const startDate = new Date(this.filterStartDate);
+      result = result.filter(supplier =>
+        supplier.createdAt && new Date(supplier.createdAt) >= startDate
+      );
+    }
+    if (this.filterEndDate) {
+      const endDate = new Date(this.filterEndDate);
+      result = result.filter(supplier =>
+        supplier.createdAt && new Date(supplier.createdAt) <= endDate
+      );
+    }
+
+    // Filtre par statut bloqué
+    if (this.filterBlocked !== 'all') {
+      result = result.filter(supplier =>
+        this.filterBlocked === 'blocked' ? supplier.blocked : !supplier.blocked
+      );
+    }
+
+    // Appliquer le tri
+    result.sort((a, b) => {
+      let valueA, valueB;
+      if (this.sortBy === 'username') {
+        valueA = a.username.toLowerCase();
+        valueB = b.username.toLowerCase();
+      } else {
+        valueA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        valueB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
       }
+      const comparison = valueA > valueB ? 1 : valueA < valueB ? -1 : 0;
+      return this.sortOrder === 'asc' ? comparison : -comparison;
     });
-    this.currentPage = 1; // Reset to the first page when searching
+
+    this.filteredSuppliers = result;
+    this.currentPage = 1; // Réinitialiser à la première page
   }
 
-  // Open modal
+  // Réinitialiser les filtres
+  resetFilters(): void {
+    this.filterUsername = '';
+    this.filterEmail = '';
+    this.filterStartDate = '';
+    this.filterEndDate = '';
+    this.filterBlocked = 'all';
+    this.sortBy = 'username';
+    this.sortOrder = 'asc';
+    this.applyFilters();
+  }
+
+  // Ouvrir le modal
   openSupplierModal(): void {
     this.isSupplierModalOpen = true;
   }
 
-  // Close modal
+  // Fermer le modal
   closeSupplierModal(): void {
     this.isSupplierModalOpen = false;
     this.selectedSupplier = null;
   }
 
+  // Ajouter un fournisseur
   addSupplier(newSupplier: User): void {
     this.userService.create(newSupplier).subscribe({
       next: () => {
         this.closeSupplierModal();
-        this.loadSuppliers(); // Reload list from backend
+        this.loadSuppliers();
       },
       error: (err) => {
-        const errorMessage = err.error?.error || 'An unknown error occurred.';
-        console.error('Error adding supplier:', errorMessage);
+        const errorMessage = err.error?.error || 'Une erreur inconnue est survenue.';
+        console.error('Erreur lors de l\'ajout du fournisseur:', errorMessage);
         alert(errorMessage);
       }
     });
   }
 
-  // Delete supplier
+  // Supprimer un fournisseur
   deleteSupplier(id: number): void {
     this.userService.delete(id).subscribe({
       next: () => {
-        this.loadSuppliers(); // Reload list from backend
+        this.loadSuppliers();
       },
       error: (err) => {
-        console.error('Error deleting supplier', err);
+        console.error('Erreur lors de la suppression du fournisseur', err);
       }
     });
   }
 
-  // Approve supplier
+  // Approuver un fournisseur
   approveSupplier(id: number): void {
-    console.log('Approved supplier with ID:', id);
+    console.log('Fournisseur approuvé avec l\'ID:', id);
   }
 
+  // Basculer le statut bloqué/non bloqué
   toggleBlockStatus(supplier: User): void {
-    const action = supplier.blocked ? 'unblock' : 'block';
-    const confirmed = confirm(`Are you sure you want to ${action} "${supplier.username}"?`);
+    const action = supplier.blocked ? 'débloquer' : 'bloquer';
+    const confirmed = confirm(`Êtes-vous sûr de vouloir ${action} "${supplier.username}" ?`);
     if (!confirmed) return;
 
     const request = supplier.blocked
@@ -127,13 +176,13 @@ export class SuppliersComponent implements OnInit {
         this.loadSuppliers();
       },
       error: (err) => {
-        console.error(`Failed to ${action}:`, err);
-        alert(`Failed to ${action} user.`);
+        console.error(`Échec du ${action}:`, err);
+        alert(`Échec du ${action} de l'utilisateur.`);
       }
     });
   }
 
-  // Pagination logic
+  // Logique de pagination
   get paginatedSuppliers(): User[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     return this.filteredSuppliers.slice(startIndex, startIndex + this.itemsPerPage);
@@ -161,11 +210,12 @@ export class SuppliersComponent implements OnInit {
     }
   }
 
+  // Copier dans le presse-papiers
   copyToClipboard(value: string): void {
     navigator.clipboard.writeText(value).then(() => {
-      alert('Password copied to clipboard!');
+      alert('Mot de passe copié dans le presse-papiers !');
     }).catch(err => {
-      console.error('Failed to copy!', err);
+      console.error('Échec de la copie !', err);
     });
   }
 }

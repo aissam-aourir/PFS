@@ -20,7 +20,6 @@ public class OrderProduct {
     @ManyToOne
     private Order order;
 
-
     @ManyToOne
     private Product product;
 }

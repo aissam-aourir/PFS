@@ -1,24 +1,29 @@
 import { Component, OnInit } from '@angular/core';
 import { ClientService } from '../../services/client.service';
-import { User } from '../../models/user';  // Assuming User model exists
+import { User } from '../../models/user';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-clients',
-  standalone:true,
-  imports:[CommonModule,FormsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './clients.component.html'
 })
 export class ClientsComponent implements OnInit {
   clients: User[] = [];
+  filteredClients: User[] = [];
   paginatedClients: User[] = [];
-  currentPage: number = 1;
-  pageSize: number = 8;
-  totalPages: number = 0;
-  searchQuery: string = '';
 
-  constructor(private clientService: ClientService) {}
+  currentPage = 1;
+  pageSize = 8;
+  totalPages = 0;
+
+  searchQuery = '';
+  filterStatus: 'all' | 'blocked' | 'active' = 'all';
+
+  constructor(private userService: UserService, private clientService: ClientService) {}
 
   ngOnInit(): void {
     this.loadClients();
@@ -27,38 +32,62 @@ export class ClientsComponent implements OnInit {
   loadClients() {
     this.clientService.getAll().subscribe((clients) => {
       this.clients = clients;
-      this.totalPages = Math.ceil(this.clients.length / this.pageSize);
-      this.paginateClients();
+      this.applyFilters();
     });
   }
 
-  approveClient(clientId: number): void {
-    // Your logic to approve the client
-    console.log('Approving client with ID:', clientId);
+  approveClient(clientId: number) {
+    console.log('Approving client ID:', clientId);
   }
 
-  blockClient(clientId: number): void {
-    // Your logic to block the client
-    console.log('Blocking client with ID:', clientId);
-  }
-  loadMoreClients(): void {
-    // Logic to load more clients if paginated
-    console.log('Loading more clients...');
+  blockClient(client: User) {
+    const action = client.blocked ? 'unblock' : 'block';
+    const confirmed = confirm(`Confirmer ${action} de ${client.username} ?`);
+    if (!confirmed) return;
+
+    const request = client.blocked
+      ? this.userService.unblockUser(client.username)
+      : this.userService.blockUser(client.username);
+
+    request.subscribe({
+      next: () => {
+        client.blocked = !client.blocked;
+        this.loadClients();
+      },
+      error: (err) => {
+        console.error(`Erreur lors de ${action}:`, err);
+        alert(`Échec de ${action} l'utilisateur.`);
+      }
+    });
   }
 
-  deleteClient(clientId: number): void {
-    // Your logic to delete the client
-    console.log('Deleting client with ID:', clientId);
-    // Example of how to call the clientService to delete a client:
-    // this.clientService.delete(clientId).subscribe(() => {
-    //   this.loadClients(); // Reload clients after deletion
-    // });
+  deleteClient(clientId: number) {
+    console.log('Suppression client ID:', clientId);
+  }
+
+  applyFilters() {
+    this.filteredClients = this.clients.filter(client => {
+      const matchesSearch =
+        client.username.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        client.email.toLowerCase().includes(this.searchQuery.toLowerCase());
+
+      const matchesStatus =
+        this.filterStatus === 'all' ||
+        (this.filterStatus === 'blocked' && client.blocked) ||
+        (this.filterStatus === 'active' && !client.blocked);
+
+      return matchesSearch && matchesStatus;
+    });
+
+    this.totalPages = Math.ceil(this.filteredClients.length / this.pageSize);
+    this.currentPage = 1;
+    this.paginateClients();
   }
 
   paginateClients() {
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    this.paginatedClients = this.clients.slice(startIndex, endIndex);
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.paginatedClients = this.filteredClients.slice(start, end);
   }
 
   previousPage() {
@@ -75,16 +104,11 @@ export class ClientsComponent implements OnInit {
     }
   }
 
-  searchClients() {
-    if (this.searchQuery.trim()) {
-      this.clients = this.clients.filter(
-        (client) =>
-          client.username.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-          client.email.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
-    } else {
-      this.loadClients(); // Re-fetch all clients if search is cleared
-    }
-    this.paginateClients();
+  onSearchChange() {
+    this.applyFilters();
+  }
+
+  onFilterStatusChange() {
+    this.applyFilters();
   }
 }

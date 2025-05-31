@@ -54,6 +54,10 @@ export class AuthService {
     });
   }
 
+  getUserId(): string | null {
+    return this.userId;
+  }
+
   loadProfile(data: any): void {
     this.isAuthenticated = true;
     this.accessToken = data['access-token'];

@@ -26,5 +26,5 @@ export class ProductService extends AbstractCrudService<Product> {
   getValidProducts(): Observable<Product[]> {
     return this.http.get<Product[]>('http://localhost:8080/api/products/valid');
   }
-  
+
 }

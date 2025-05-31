@@ -6,6 +6,7 @@ import com.ordex.security.entities.Utilisateur;
 import java.util.List;
 
 public interface AccountService {
+    //mise a jour ici dans addnewuser mais je l'ai supprime , il faut que je la rajoute apres
     Utilisateur addNewUser(String username, String password, String email);
     AppRole addNewRole(String role);
     void addRoleToUser(String username,String role);

@@ -1,95 +1,107 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Order } from '../../models/order';
 import { OrderService } from '../../services/order.service';
 import { AuthService } from '../../services/auth.service';
-import { ToastrModule, ToastrService } from 'ngx-toastr';
+import { Order } from '../../models/order';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-user-orders',
   standalone: true,
-  imports: [CommonModule, ToastrModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './user-orders.component.html'
 })
 export class UserOrdersComponent implements OnInit {
-  selectedOrder: Order | null = null;
   orders: Order[] = [];
-  currentPage = 1;
-  itemsPerPage = 8;
+  filteredOrders: Order[] = [];
+  statusFilter: string = 'all'; // ici on va faire filtrage
+  dateSort: string = 'desc';    // ici on va faire tri par date
+  totalSort: string = 'none';   // ici on va faire tri par montant total
 
   constructor(
     private orderService: OrderService,
-    private authService: AuthService,
-    private toastr: ToastrService
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    this.fetchUserOrders();
-  }
-
-  fetchUserOrders(): void {
-    const username = this.authService.username;
-    if (username) {
-      this.orderService.getOrdersByUser(username).subscribe(
-        (data: Order[]) => {
-          // Normaliser les statuts pour uniformité
-          this.orders = data.map(order => ({
-            ...order,
-            status: order.status.replace(/cancelled/i, 'Annulé')
+    const clientId = this.authService.getUserId();
+    console.log('Client ID:', clientId);
+    if (clientId) {
+      this.orderService.getOrdersByUserId(clientId).subscribe({
+        next: (data: any[]) => {
+          console.log('Commandes reçues:', data);
+          this.orders = data.map(item => ({
+            id: item.id,
+            total: item.total,
+            status: item.status.toUpperCase(), // Normalisation des statuts en majuscules
+            phone: item.phone,
+            createdAt: item.createdAt,
+            paymentMethod: item.paymentMethod,
+            client: {
+              username: item.client?.username || 'Inconnu'
+            },
+            orderProducts: item.orderProducts?.map((op: any) => ({
+              id: op.id || 0,
+              quantity: op.quantity,
+              priceAtPurchases: op.priceAtPurchases,
+              order: null,
+              product: {
+                id: op.product?.id,
+                name: op.product?.name,
+                description: '',
+                price: 0,
+                stock: 0,
+                imageURL: op.product?.imageURL || '',
+                createdAt: '',
+                category: { id: 0, name: '' },
+                isValidByAdmin: false,
+                supplier: null
+              }
+            })) || []
           }));
-          console.log('Commandes utilisateur :', this.orders);
+          console.log('Orders assignées:', this.orders);
+          this.applyFilters();
         },
-        (error) => {
-          console.error('Erreur lors de la récupération des commandes utilisateur', error);
-          this.toastr.error('Échec du chargement des commandes.', 'Erreur', {
-            timeOut: 3000,
-            positionClass: 'toast-top-right',
-            progressBar: true
-          });
-        }
-      );
+        error: (err) => console.error('Erreur de récupération des commandes', err)
+      });
+    } else {
+      console.error('Client ID non défini');
     }
   }
 
-  getStatusClass(status: string): string {
-    switch (status.trim().toLowerCase()) {
-      case 'en attente':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'complété':
-        return 'bg-green-100 text-green-800';
-      case 'annulé':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+  applyFilters(): void {
+    let tempOrders = [...this.orders];
+
+    // Filtre par statut
+    if (this.statusFilter !== 'all') {
+      tempOrders = tempOrders.filter(order => order.status === this.statusFilter);
     }
-  }
 
-  viewProducts(order: Order): void {
-    this.selectedOrder = order;
-  }
-
-  get paginatedOrders(): Order[] {
-    const start = (this.currentPage - 1) * this.itemsPerPage;
-    return this.orders.slice(start, start + this.itemsPerPage);
-  }
-
-  get totalPages(): number {
-    return Math.ceil(this.orders.length / this.itemsPerPage);
-  }
-
-  goToPage(page: number) {
-    this.currentPage = page;
-  }
-
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
+    // Tri par date
+    if (this.dateSort !== 'none') {
+      tempOrders.sort((a, b) => {
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
+        return this.dateSort === 'asc' ? dateA - dateB : dateB - dateA;
+      });
     }
+
+    // Tri par montant total
+    if (this.totalSort !== 'none') {
+      tempOrders.sort((a, b) => {
+        return this.totalSort === 'asc' ? a.total - b.total : b.total - a.total;
+      });
+    }
+
+    this.filteredOrders = tempOrders;
   }
 
-  prevPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-    }
+  onFilterChange(): void {
+    this.applyFilters();
+  }
+
+  handleImageError(event: Event, productName: string) {
+    console.error(`Erreur de chargement de l'image pour le produit ${productName}:`, (event.target as HTMLImageElement).src);
   }
 }

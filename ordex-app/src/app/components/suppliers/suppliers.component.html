@@ -1,29 +1,77 @@
 <div class="bg-white p-6 rounded-md shadow-md">
-  <div class="flex justify-between mb-4 w-full space-x-4">
-    <div class="flex space-x-4">
-      <select
-        [(ngModel)]="searchCriteria"
-        (change)="onCriteriaChange()"
-        class="border border-gray-300 rounded-md px-8 py-4 w-2/5 text-xl"
-      >
-        <option value="username">Username</option>
-        <option value="email">Email</option>
-        <option value="createdAt">Created At</option>
-        <option value="blocked">Blocked</option>
-      </select>
+  <!-- Filtres -->
+  <div class="flex flex-col mb-6 space-y-4">
+    <div class="flex justify-between items-center">
+      <h2 class="text-xl font-semibold text-gray-700">Gestion des Fournisseurs</h2>
+      <button (click)="openSupplierModal()" class="bg-yellow-600 hover:bg-yellow-800 text-white px-4 py-2 rounded-md">
+        Ajouter un Fournisseur
+      </button>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
       <input
         type="text"
-        placeholder="Entrez votre recherche..."
-        class="border border-gray-300 rounded-md px-8 py-4 w-3/5 text-xl"
-        [(ngModel)]="searchQuery"
-        (ngModelChange)="onSearch()"
+        placeholder="Rechercher par nom d'utilisateur..."
+        class="border border-gray-300 rounded-md px-4 py-2 text-base"
+        [(ngModel)]="filterUsername"
+        (ngModelChange)="applyFilters()"
+      />
+      <input
+        type="text"
+        placeholder="Rechercher par email..."
+        class="border border-gray-300 rounded-md px-4 py-2 text-base"
+        [(ngModel)]="filterEmail"
+        (ngModelChange)="applyFilters()"
+      />
+      <input
+        type="date"
+        placeholder="Date de début"
+        class="border border-gray-300 rounded-md px-4 py-2 text-base"
+        [(ngModel)]="filterStartDate"
+        (ngModelChange)="applyFilters()"
+      />
+      <input
+        type="date"
+        placeholder="Date de fin"
+        class="border border-gray-300 rounded-md px-4 py-2 text-base"
+        [(ngModel)]="filterEndDate"
+        (ngModelChange)="applyFilters()"
       />
     </div>
-    <button (click)="openSupplierModal()" class="bg-yellow-600 hover:bg-yellow-800 text-white px-4 py-2 rounded-md">
-      Add New Supplier
-    </button>
+    <div class="flex justify-between items-center">
+      <div class="flex space-x-4">
+        <select
+          [(ngModel)]="filterBlocked"
+          (ngModelChange)="applyFilters()"
+          class="border border-gray-300 rounded-md px-4 py-2 text-base"
+        >
+          <option value="all">Tous les statuts</option>
+          <option value="blocked">Bloqué</option>
+          <option value="unblocked">Non bloqué</option>
+        </select>
+        <select
+          [(ngModel)]="sortBy"
+          (ngModelChange)="applyFilters()"
+          class="border border-gray-300 rounded-md px-4 py-2 text-base"
+        >
+          <option value="username">Trier par Nom</option>
+          <option value="createdAt">Trier par Date</option>
+        </select>
+        <select
+          [(ngModel)]="sortOrder"
+          (ngModelChange)="applyFilters()"
+          class="border border-gray-300 rounded-md px-4 py-2 text-base"
+        >
+          <option value="asc">Croissant</option>
+          <option value="desc">Décroissant</option>
+        </select>
+      </div>
+      <button (click)="resetFilters()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+        Réinitialiser
+      </button>
+    </div>
   </div>
 
+  <!-- Modal -->
   <app-new-supplier-modal
     *ngIf="isSupplierModalOpen"
     [isOpen]="isSupplierModalOpen"
@@ -31,68 +79,52 @@
     (close)="closeSupplierModal()"
   ></app-new-supplier-modal>
 
+  <!-- Table -->
   <div class="overflow-x-auto">
     <table class="min-w-full bg-white">
       <thead>
       <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-        <th class="py-3 px-6 text-left">Username</th>
-        <th class="py-3 px-6 text-left">Password</th>
+        <th class="py-3 px-6 text-left">Nom d'utilisateur</th>
         <th class="py-3 px-6 text-left">Email</th>
-        <th class="py-3 px-6 text-left">Created At</th>
+        <th class="py-3 px-6 text-left">Date de création</th>
         <th class="py-3 px-6 text-center">Actions</th>
       </tr>
       </thead>
       <tbody class="text-gray-600 text-base font-light">
       <tr *ngFor="let supplier of paginatedSuppliers" class="border-b border-gray-200 hover:bg-gray-100">
         <td class="py-3 px-6 text-left">{{ supplier.username }}</td>
-        <td class="py-3 px-6 text-left">
-            <span
-              (click)="copyToClipboard(supplier.password)"
-              class="cursor-pointer text-blue-600 hover:underline"
-              title="Click to copy"
-            >
-              {{ supplier.password.slice(0, 10) }}...
-            </span>
-        </td>
-
         <td class="py-3 px-6 text-left">{{ supplier.email }}</td>
         <td class="py-3 px-6 text-left">{{ supplier.createdAt | date:'medium' }}</td>
         <td class="py-3 px-6 text-center space-x-2">
-          <!-- Approve Button -->
-          <button (click)="approveSupplier(supplier.id!)" class="hover:text-green-600 text-green-500 p-2 rounded-md">
-            <i class="fas fa-check text-xl"></i> <!-- Approve -->
-          </button>
-
-          <!-- Toggle Block/Unblock Button -->
+<!--          <button (click)="approveSupplier(supplier.id!)" class="hover:text-green-600 text-green-500 p-2 rounded-md" title="Approuver">-->
+<!--            <i class="fas fa-check text-xl"></i>-->
+<!--          </button>-->
           <button
             (click)="toggleBlockStatus(supplier)"
             class="p-2 rounded-md"
             [ngClass]="supplier.blocked ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800'"
-            [title]="supplier.blocked ? 'Unblock' : 'Block'"
+            [title]="supplier.blocked ? 'Débloquer' : 'Bloquer'"
           >
             <i [ngClass]="supplier.blocked ? 'fas fa-unlock' : 'fas fa-ban'" class="text-xl"></i>
           </button>
-
-          <!-- Delete Button -->
-          <button (click)="deleteSupplier(supplier.id!)" class="hover:text-red-600 text-red-500 p-2 rounded-md">
-            <i class="fas fa-trash-alt text-xl"></i> <!-- Delete -->
-          </button>
+<!--          <button (click)="deleteSupplier(supplier.id!)" class="hover:text-red-600 text-red-500 p-2 rounded-md" title="Supprimer">-->
+<!--            <i class="fas fa-trash-alt text-xl"></i>-->
+<!--          </button>-->
         </td>
       </tr>
       </tbody>
     </table>
   </div>
 
-  <!-- Pagination Controls -->
+  <!-- Pagination -->
   <div class="flex justify-center mt-6 space-x-2">
     <button
       (click)="prevPage()"
       [disabled]="currentPage === 1"
       class="px-3 py-1 rounded-md bg-gray-300 hover:bg-gray-400 disabled:opacity-50"
     >
-      Prev
+      Précédent
     </button>
-
     <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
       <button
         (click)="goToPage(i + 1)"
@@ -103,13 +135,12 @@
         {{ i + 1 }}
       </button>
     </ng-container>
-
     <button
       (click)="nextPage()"
       [disabled]="currentPage === totalPages"
       class="px-3 py-1 rounded-md bg-gray-300 hover:bg-gray-400 disabled:opacity-50"
     >
-      Next
+      Suivant
     </button>
   </div>
 </div>

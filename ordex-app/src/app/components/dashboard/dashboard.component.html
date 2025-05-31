@@ -1,1 +1,42 @@
-<p>dashboard works!</p>
+<div class="min-h-screen bg-gray-100 p-6">
+  <!-- Profile Section -->
+  <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-xl shadow-xl p-6 mb-6 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+    <!-- Profile Info -->
+    <div class="flex-1">
+      <h2 class="text-3xl font-bold mb-2">Bienvenue, {{ user?.username }}</h2>
+      <p class="text-blue-100 mb-1">Email: {{ user?.email }}</p>
+      <p class="text-blue-200 text-sm">Membre depuis: {{ user?.createdAt | date:'medium' }}</p>
+    </div>
+  </div>
+
+  <!-- Dashboard Summary -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+      Tableau de Bord Admin
+      <span *ngIf="isLoading" class="ml-3 inline-block h-5 w-5 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <div class="p-4 bg-blue-50 rounded-lg text-center hover:bg-blue-100 transition">
+        <h3 class="text-lg font-medium text-gray-700">Clients</h3>
+        <p class="text-3xl font-bold text-blue-600">{{ clientsCount }}</p>
+      </div>
+      <div class="p-4 bg-green-50 rounded-lg text-center hover:bg-green-100 transition">
+        <h3 class="text-lg font-medium text-gray-700">Commandes</h3>
+        <p class="text-3xl font-bold text-green-600">{{ ordersCount }}</p>
+      </div>
+      <div class="p-4 bg-purple-50 rounded-lg text-center hover:bg-purple-100 transition">
+        <h3 class="text-lg font-medium text-gray-700">Catégories</h3>
+        <p class="text-3xl font-bold text-purple-600">{{ categoriesCount }}</p>
+      </div>
+      <div class="p-4 bg-yellow-50 rounded-lg text-center hover:bg-yellow-100 transition">
+        <h3 class="text-lg font-medium text-gray-700">Fournisseurs</h3>
+        <p class="text-3xl font-bold text-yellow-600">{{ suppliersCount }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mt-6 text-center text-gray-500 text-sm">
+    <p>Mis à jour le {{ currentDate | date:'full' }} | © 2025 Ordex. Tous droits réservés.</p>
+  </div>
+</div>

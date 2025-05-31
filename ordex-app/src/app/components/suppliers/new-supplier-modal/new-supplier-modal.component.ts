@@ -20,7 +20,8 @@ export class NewSupplierModalComponent {
     this.supplierForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required], // ✅ added password
-      email: ['', [Validators.required, Validators.email]]
+      email: ['', [Validators.required, Validators.email]],
+      phone: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]] // Example pattern for 10-digit phone number
     });
   }
 
@@ -31,7 +32,7 @@ export class NewSupplierModalComponent {
         password: this.supplierForm.value.password,
         email: this.supplierForm.value.email
       };
-      this.createSupplier.emit(supplier);     
+      this.createSupplier.emit(supplier);
       this.supplierForm.reset({
         role: 'SUPPLIER' // reset form and set default role again
       });

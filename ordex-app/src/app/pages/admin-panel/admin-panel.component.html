@@ -1,42 +1,36 @@
 <div class="flex h-screen">
-  <!-- Sidebar -->
+  <!-- Barre latérale -->
   <nav class="w-64 bg-gray-800 text-white p-5 flex flex-col">
     <!-- Logo -->
     <div class="flex items-center justify-center mb-8">
       <img src="../../../assets/logo2.png" alt="Logo" class="h-20">
     </div>
 
-    <!-- Admin Username Display -->
+    <!-- Nom de l'administrateur -->
     <div class="text-center text-lg font-semibold text-gray-200 mb-8">
-      <p>{{ username }}</p> <!-- Dynamic username here -->
+      <p>{{ username }}</p> <!-- Nom dynamique de l'utilisateur -->
     </div>
 
-    <!-- Sidebar Menu -->
+    <!-- Menu de navigation -->
     <ul class="space-y-4 flex-1">
       <li>
         <a routerLink="dashboard" routerLinkActive="text-yellow-400 bg-gray-700" class="block px-4 py-2 rounded-md hover:bg-gray-700">
-          Dashboard
+          Tableau de bord
         </a>
       </li>
       <li>
         <a routerLink="products" routerLinkActive="text-yellow-400 bg-gray-700" class="block px-4 py-2 rounded-md hover:bg-gray-700">
-          Products
+          Produits
         </a>
       </li>
-      <!-- <li>
-        <a routerLink="categories" routerLinkActive="text-yellow-400 bg-gray-700" class="block px-4 py-2 rounded-md hover:bg-gray-700">
-          Categories
-        </a>
-      </li> -->
       <li>
         <a routerLink="orders" routerLinkActive="text-yellow-400 bg-gray-700" class="block px-4 py-2 rounded-md hover:bg-gray-700">
-          Orders
+          Commandes
         </a>
       </li>
-
       <li>
-        <a routerLink="deliveries" routerLinkActive="text-yellow-400 bg-gray-700" class="block px-4 py-2 rounded-md hover:bg-gray-700">
-          Deliveries
+        <a routerLink="categories" routerLinkActive="text-yellow-400 bg-gray-700" class="block px-4 py-2 rounded-md hover:bg-gray-700">
+          Catégories
         </a>
       </li>
       <li>
@@ -46,28 +40,28 @@
       </li>
       <li>
         <a routerLink="suppliers" routerLinkActive="text-yellow-400 bg-gray-700" class="block px-4 py-2 rounded-md hover:bg-gray-700">
-          Suppliers
+          Fournisseurs
         </a>
       </li>
     </ul>
 
-    <!-- Log Out Section -->
+    <!-- Bouton de déconnexion -->
     <div class="mt-auto text-center">
       <button (click)="logout()" class="w-full bg-red-800 hover:bg-red-900 text-white py-2 rounded-md flex items-center justify-center space-x-2">
         <i class="fas fa-sign-out-alt"></i>
-        <span>Log Out</span>
+        <span>Déconnexion</span>
       </button>
     </div>
 
-    <!-- Sidebar Footer -->
+    <!-- Pied de page de la barre latérale -->
     <div class="mt-4 text-center text-sm text-gray-500">
-      <p>© 2025 Ordex. All rights reserved.</p>
+      <p>© 2025 Ordex. Tous droits réservés.</p>
     </div>
   </nav>
 
-  <!-- Main Content Area -->
+  <!-- Contenu principal -->
   <div class="flex-1 bg-gray-100 p-6">
-    <!-- Router Outlet for the content of each page -->
+    <!-- Affichage dynamique des composants via le router -->
     <router-outlet></router-outlet>
   </div>
 </div>

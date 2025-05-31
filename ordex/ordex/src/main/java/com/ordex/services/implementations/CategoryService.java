@@ -1,18 +1,24 @@
 package com.ordex.services.implementations;
 
 import com.ordex.entities.Category;
+import com.ordex.helpers.CategoryDetailsDTO;
 import com.ordex.repository.CategoryRepository;
+import com.ordex.repository.ProductRepository;
+import com.ordex.security.repository.UtilisateurRepository;
 import com.ordex.services.interfaces.ICategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CategoryService implements ICategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final UtilisateurRepository utilisateurRepository;
+    private final ProductRepository productRepository;
 
     @Override
     public Category save(Category category) {
@@ -24,6 +30,9 @@ public class CategoryService implements ICategoryService {
         Category existing = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
         existing.setName(category.getName());
+        if (category.getUser() != null) {
+            existing.setUser(category.getUser());
+        }
         return categoryRepository.save(existing);
     }
 
@@ -41,5 +50,22 @@ public class CategoryService implements ICategoryService {
     @Override
     public List<Category> getAll() {
         return categoryRepository.findAll();
+    }
+
+    @Override
+    public List<CategoryDetailsDTO> getAllCategoryDetails() {
+        List<Category> categories = categoryRepository.findAll();
+        return categories.stream().map(category -> {
+            CategoryDetailsDTO dto = new CategoryDetailsDTO();
+            dto.setId(category.getId());
+            dto.setName(category.getName());
+            if (category.getUser() != null) {
+                dto.setFournisseurName(category.getUser().getUsername());
+            } else {
+                dto.setFournisseurName("Non assigné");
+            }
+            dto.setProductCount(productRepository.countByCategoryId(category.getId()));
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

@@ -147,16 +147,17 @@ public class AccountServiceImpl implements AccountService {
         return reversed;
     }
 
-
     public Utilisateur blockUser(String username) {
+        System.out.println("22222222222222222222222222222");
         Utilisateur user = utilisateurRepository.findByUsername(username);
+        System.out.println("3333333333333333333333333333333");
         if (user == null) {
             throw new RuntimeException("Utilisateur non trouvé");
         }
         user.setBlocked(true);
+        System.out.println("444444444444444444444444444444444444");
         return utilisateurRepository.save(user);
     }
-
 
     public Utilisateur unblockUser(String username) {
         Utilisateur user = utilisateurRepository.findByUsername(username);

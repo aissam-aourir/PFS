@@ -69,8 +69,9 @@ public class SecurityController {
             this.accountService.verifyResetCode(email, password, code);
             Map<String, String> response = new HashMap<>();
             response.put("message", "Code vérifié avec succès");
+            this.emailService.sendPasswordResetSuccess(email);
             return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
+        }catch (RuntimeException e) {
             Map<String, String> response = new HashMap<>();
             response.put("error", e.getMessage());
             return ResponseEntity.badRequest().body(response);
@@ -94,7 +95,7 @@ public class SecurityController {
             if (user.isBlocked()) {
                 return ResponseEntity.status(403).body(Map.of("error", "User is blocked"));
             }
-
+            this.emailService.sendLoginNotification(user.getEmail(),user.getUsername());
             String jwt = jwtService.generateToken(authentication, user);
 
             return ResponseEntity.ok(Map.of("access-token", jwt));
@@ -174,6 +175,7 @@ public class SecurityController {
     public ResponseEntity<?> blockUser(@PathVariable String username) {
         try {
             Utilisateur blockedUser = accountService.blockUser(username);
+            this.emailService.sendBlockNotification(blockedUser.getEmail(), blockedUser.getUsername());
             return ResponseEntity.ok(Map.of("message", "User blocked successfully", "user", blockedUser));
         } catch (RuntimeException e) {
             return ResponseEntity.status(400).body(Map.of("error", e.getMessage()));
@@ -184,6 +186,8 @@ public class SecurityController {
     public ResponseEntity<?> unblockUser(@PathVariable String username) {
         try {
             Utilisateur unblockedUser = accountService.unblockUser(username);
+            emailService.sendUnblockNotification(unblockedUser.getEmail(), unblockedUser.getUsername());
+            System.out.println("unblocked useryyyyyy : " + unblockedUser.getUsername());
             return ResponseEntity.ok(Map.of("message", "User unblocked successfully"));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

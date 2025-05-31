@@ -45,4 +45,16 @@ public class OrderService implements IOrderService {
     public List<Order> getAll() {
         return orderRepository.findAll();
     }
+
+//    //ajouted method to get orders by client ID
+//    @Override
+//    public List<Order> getOrdersByClientId(Long clientId) {
+//
+//    }
+
+
+    @Override
+    public List<Order> getOrdersByClientUserId(Long clientId) {
+        return orderRepository.findByClientUserId(clientId);
+    }
 }

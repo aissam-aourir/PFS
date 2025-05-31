@@ -1,96 +1,159 @@
-<div class="p-6 bg-white shadow-md rounded-2xl max-w-7xl mx-auto">
-  <h2 class="text-2xl font-bold mb-6">Mes Commandes</h2>
+<div class="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
+  <!-- En-tête -->
+  <div class="max-w-7xl mx-auto">
+    <div class="flex items-center justify-between mb-8">
+      <h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">Mes Commandes</h1>
+      <a routerLink="/home/products" class="text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors">
+        Continuer mes achats →
+      </a>
+    </div>
 
-  <table class="min-w-full text-sm text-gray-600">
-    <thead class="text-xs text-center text-gray-700 uppercase bg-gray-100">
-    <tr>
-      <th class="px-4 py-3">ID Commande</th>
-      <th class="px-4 py-3">Total</th>
-      <th class="px-4 py-3">Méthode de Paiement</th>
-      <th class="px-4 py-3">Statut</th>
-      <th class="px-4 py-3">Date</th>
-      <th class="px-4 py-3">Détails</th>
-    </tr>
-    </thead>
-    <tbody>
-    <ng-container *ngFor="let order of paginatedOrders">
-      <tr class="bg-white border-b text-center hover:bg-gray-50">
-        <td class="px-4 py-3">{{ order.id }}</td>
-        <td class="px-4 py-3">{{ order.total.toFixed(2) }} €</td>
-        <td class="px-4 py-3 capitalize">{{ order.paymentMethod }}</td>
-        <td class="px-4 py-3">
-            <span [ngClass]="getStatusClass(order.status)" class="px-3 py-1 rounded-full text-xs font-semibold">
-              {{ order.status }}
-            </span>
-        </td>
-        <td class="px-4 py-3">{{ order.createdAt | date:'short' }}</td>
-        <td class="px-4 py-3">
-          <button
-            class="text-indigo-600 hover:underline"
-            (click)="selectedOrder === order ? selectedOrder = null : viewProducts(order)">
-            <i class="fas fa-eye text-lg"></i>
-          </button>
-        </td>
-      </tr>
+    <!-- Filtres -->
+    <div class="bg-white p-6 rounded-xl shadow-sm mb-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Filtres</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <!-- Filtre par statut -->
+        <div>
+          <label for="statusFilter" class="block text-sm font-medium text-gray-700">Statut</label>
+          <select
+            id="statusFilter"
+            [(ngModel)]="statusFilter"
+            (change)="onFilterChange()"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
+          >
+            <option value="all">Tous</option>
+            <option value="PENDING">En attente</option>
+            <option value="COMPLETED">Terminé</option>
+            <option value="CANCELED">Annulé</option>
+          </select>
+        </div>
 
-      <!-- Ligne des détails du produit -->
-      <tr *ngIf="selectedOrder === order" class="bg-gray-50 border-t">
-        <td colspan="6" class="px-6 py-4">
-          <div class="space-y-4">
-            <h4 class="text-lg font-semibold">Produits dans la commande #{{ order.id }}</h4>
-            <div class="flex items-center justify-between p-3 bg-indigo-50 border border-indigo-200 rounded-lg shadow-sm">
-              <span class="text-sm font-semibold text-indigo-800">Total :</span>
-              <span class="text-lg font-bold text-indigo-600">{{ order.total.toFixed(2) }} €</span>
+        <!-- Tri par date -->
+        <div>
+          <label for="dateSort" class="block text-sm font-medium text-gray-700">Trier par date</label>
+          <select
+            id="dateSort"
+            [(ngModel)]="dateSort"
+            (change)="onFilterChange()"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
+          >
+            <option value="desc">Plus récent au plus ancien</option>
+            <option value="asc">Plus ancien au plus récent</option>
+            <option value="none">Aucun tri</option>
+          </select>
+        </div>
+
+        <!-- Tri par montant total -->
+        <div>
+          <label for="totalSort" class="block text-sm font-medium text-gray-700">Trier par montant</label>
+          <select
+            id="totalSort"
+            [(ngModel)]="totalSort"
+            (change)="onFilterChange()"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
+          >
+            <option value="none">Aucun tri</option>
+            <option value="asc">Croissant</option>
+            <option value="desc">Décroissant</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message si aucune commande -->
+    <div *ngIf="filteredOrders.length === 0" class="bg-white p-8 rounded-xl shadow-sm text-center">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18l-2 13H5L3 3zm7 7h4" />
+      </svg>
+      <p class="mt-4 text-lg text-gray-600">Aucune commande ne correspond à vos critères.</p>
+      <a routerLink="/home/products" class="mt-6 inline-block px-6 py-3 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors">
+        Découvrir nos produits
+      </a>
+    </div>
+
+    <!-- Liste des commandes -->
+    <div *ngIf="filteredOrders.length > 0" class="space-y-6">
+      <div *ngFor="let order of filteredOrders; let i = index" class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <!-- En-tête de la commande -->
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-6 bg-gray-50">
+          <div class="flex items-center space-x-4">
+            <div class="flex-shrink-0 w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
             </div>
-            <div class="grid gap-4">
-              <div
-                *ngFor="let op of order.orderProducts"
-                class="flex justify-between items-center p-4 border rounded-lg bg-white shadow-sm"
-              >
-                <div>
-                  <h5 class="font-bold">{{ op.product.name }}</h5>
-                  <p class="text-gray-500 text-sm">{{ op.product.description }}</p>
+            <div>
+              <h2 class="text-lg font-semibold text-gray-900">Commande {{ i + 1 }}</h2>
+              <p class="text-sm text-gray-500">Passée le {{ order.createdAt | date:'mediumDate' }}</p>
+            </div>
+          </div>
+          <div class="mt-4 sm:mt-0 flex items-center space-x-4">
+            <span class="inline-block px-3 py-1 text-xs font-medium rounded-full capitalize"
+                  [ngClass]="{
+                    'bg-green-100 text-green-800': order.status === 'COMPLETED',
+                    'bg-yellow-100 text-yellow-800': order.status === 'PENDING',
+                    'bg-red-100 text-red-800': order.status === 'CANCELED'
+                  }">
+              {{ order.status === 'COMPLETED' ? 'Terminé' : order.status === 'PENDING' ? 'En attente' : 'Annulé' }}
+            </span>
+            <button class="text-sm text-orange-600 hover:text-orange-700 font-medium">Voir les détails</button>
+          </div>
+        </div>
+
+        <!-- Détails de la commande -->
+        <div class="p-6 border-t border-gray-100">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Informations générales -->
+            <div>
+              <h3 class="text-sm font-medium text-gray-900 mb-2">Détails</h3>
+              <p class="text-sm text-gray-600"><strong>Total :</strong> {{ order.total | number:'1.2-2' }} MAD</p>
+              <p class="text-sm text-gray-600"><strong>Méthode de paiement :</strong> {{ order.paymentMethod }}</p>
+              <p class="text-sm text-gray-600"><strong>Date :</strong> {{ order.createdAt | date:'medium' }}</p>
+            </div>
+            <!-- Contact -->
+            <div>
+              <h3 class="text-sm font-medium text-gray-900 mb-2">Contact</h3>
+              <p class="text-sm text-gray-600"><strong>Téléphone :</strong> {{ order.phone }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Produits -->
+        <div class="p-6 border-t border-gray-100">
+          <h3 class="text-sm font-medium text-gray-900 mb-4">Produits</h3>
+          <div class="space-y-4">
+            <div *ngFor="let product of order.orderProducts" class="flex items-center py-3 border-b last:border-b-0">
+              <div class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden">
+                <img *ngIf="product.product.imageURL" [src]="product.product.imageURL" [alt]="product.product.name" class="w-full h-full object-cover"
+                     (error)="handleImageError($event, product.product.name)">
+                <div *ngIf="!product.product.imageURL" class="w-full h-full bg-gray-100 flex items-center justify-center">
+                  <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                  </svg>
                 </div>
-                <div class="text-right text-sm">
-                  <p>Quantité : <span class="font-semibold">{{ op.quantity }}</span></p>
-                  <p>Prix : {{ op.priceAtPurchases.toFixed(2) }} €</p>
-                </div>
+              </div>
+              <div class="ml-4 flex-1">
+                <p class="text-sm font-medium text-gray-900">{{ product.product.name }}</p>
+                <p class="text-sm text-gray-500">Quantité : {{ product.quantity }}</p>
+                <p class="text-sm text-gray-500">Prix unitaire : {{ product.priceAtPurchases | number:'1.2-2' }} MAD</p>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-medium text-gray-900">{{ (product.quantity * product.priceAtPurchases) | number:'1.2-2' }} MAD</p>
               </div>
             </div>
           </div>
-        </td>
-      </tr>
-    </ng-container>
-    </tbody>
-  </table>
+        </div>
 
-  <!-- Contrôles de pagination -->
-  <div class="flex justify-center mt-6 space-x-2">
-    <button
-      (click)="prevPage()"
-      [disabled]="currentPage === 1"
-      class="px-3 py-1 rounded-md bg-gray-300 hover:bg-gray-400 disabled:opacity-50"
-    >
-      Précédent
-    </button>
-
-    <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
-      <button
-        (click)="goToPage(i + 1)"
-        [class.bg-blue-500]="currentPage === (i + 1)"
-        [class.text-white]="currentPage === (i + 1)"
-        class="px-3 py-1 rounded-md bg-gray-300 hover:bg-gray-400"
-      >
-        {{ i + 1 }}
-      </button>
-    </ng-container>
-
-    <button
-      (click)="nextPage()"
-      [disabled]="currentPage === totalPages"
-      class="px-3 py-1 rounded-md bg-gray-300 hover:bg-gray-400 disabled:opacity-50"
-    >
-      Suivant
-    </button>
+        <!-- Actions -->
+        <div class="p-6 border-t border-gray-100 bg-gray-50 flex justify-end space-x-4">
+          <button class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors">
+            Contacter le support
+          </button>
+          <button *ngIf="order.status === 'PENDING'" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors">
+            Annuler la commande
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

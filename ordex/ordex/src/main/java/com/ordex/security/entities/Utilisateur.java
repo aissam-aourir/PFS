@@ -15,11 +15,13 @@ import java.util.List;
 public class Utilisateur {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long userId;
     @Column(unique = true)
     private String username;
     private String password;
     private String email;
+    private String phone;
     private  LocalDateTime createdAt;
     private boolean blocked;
     private String tem_password=null;
@@ -35,4 +37,8 @@ public class Utilisateur {
     //un user qui est un client peut avoir plusieurs favoris et un favoris peut etre appartenant a plusieurs utilisateurs
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Favoris> favoris;
+     //je viens de creer une enumeration contennat deux cas Actif et Inactif sous le nom de status
+     //et pour chaque user je vais lui attribuer un status
+     //mais pas maintennat c'est apres
+
 }

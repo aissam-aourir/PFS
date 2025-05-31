@@ -42,7 +42,7 @@ export class ProductsComponent implements OnInit {
   ngOnInit(): void {
     if (this.authService.userId) {
       this.supplierId = this.authService.userId;
-      this.loadProductsBySupplier(this.supplierId); 
+      this.loadProductsBySupplier(this.supplierId);
     } else {
       this.toastr.error("Supplier ID is missing", "Error");
     }
@@ -67,7 +67,7 @@ export class ProductsComponent implements OnInit {
       }
     });
   }
-  
+
   // loadProducts(): void {
   //   this.productService.getAll().subscribe({
   //     next: (data) => {
@@ -101,11 +101,11 @@ export class ProductsComponent implements OnInit {
     this.productToEdit = product;
     this.isEditModalOpen = true;
   }
-  
+
   closeEditModal() {
     this.isEditModalOpen = false;
   }
-  
+
 
 
 openCategoryModal() {
@@ -116,7 +116,7 @@ closeCategoryModal() {
   this.isCategoryModalOpen = false;
 }
 
-  
+
   addProduct(product: Product): void {
     this.productService.create(product).subscribe({
       next: (newProduct) => {
@@ -176,9 +176,9 @@ closeCategoryModal() {
       }
     });
   }
-  
 
-  
+
+
 addCategory(name: string): void {
   const newCategory: Partial<Category> = { name };
   this.categoryService.create(newCategory).subscribe({

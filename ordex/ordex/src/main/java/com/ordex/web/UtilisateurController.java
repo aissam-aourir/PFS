@@ -22,4 +22,7 @@ public class UtilisateurController {
         List<Utilisateur> clients = accountService.getAllClients();
         return ResponseEntity.ok(clients);
     }
+
+
+
 }

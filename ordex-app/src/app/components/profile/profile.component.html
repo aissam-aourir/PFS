@@ -1,0 +1,61 @@
+<div class="min-h-screen bg-gradient-to-tr from-orange-50 via-white to-orange-100 py-14 px-6">
+  <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden ring-1 ring-orange-100">
+
+    <!-- Header -->
+    <div class="bg-orange-600 px-8 py-6 flex flex-col sm:flex-row justify-between items-start sm:items-center text-white">
+      <h1 class="text-3xl font-bold tracking-tight">👤 Mon Profil</h1>
+      <a routerLink="/home/products" class="mt-2 sm:mt-0 text-sm font-medium underline hover:text-orange-200 transition">
+        Continuer mes achats →
+      </a>
+    </div>
+
+    <!-- Content -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 px-10 py-10 bg-white">
+
+      <!-- Avatar & Membre depuis -->
+      <div class="flex flex-col items-center lg:items-start text-center lg:text-left space-y-4">
+        <div class="w-28 h-28 rounded-full bg-orange-100 flex items-center justify-center border-4 border-white shadow ring-4 ring-orange-300">
+          <svg class="w-14 h-14 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M5.121 17.804A4 4 0 0110 16h4a4 4 0 014.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </div>
+        <p class="text-sm text-gray-500"><span class="font-semibold">🗓️ Membre depuis :</span><br> {{ user?.createdAt }}</p>
+      </div>
+
+      <!-- Infos principales -->
+      <div class="lg:col-span-2 space-y-8">
+
+        <div>
+          <h2 class="text-2xl font-semibold text-gray-800">Bienvenue, <span class="text-orange-600">{{ user?.username }}</span></h2>
+          <p class="text-gray-500">Voici les détails de votre compte personnel :</p>
+        </div>
+
+        <!-- Cartes Infos -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="bg-orange-50 p-5 rounded-2xl shadow-sm border border-orange-100">
+            <h3 class="text-lg font-semibold text-orange-700 mb-3">🧍 Informations personnelles</h3>
+            <ul class="text-gray-700 text-sm space-y-2">
+              <li><span class="font-medium">Nom d'utilisateur :</span> {{ user?.username }}</li>
+              <li><span class="font-medium">Email :</span> {{ user?.email }}</li>
+            </ul>
+          </div>
+          <div class="bg-orange-50 p-5 rounded-2xl shadow-sm border border-orange-100">
+            <h3 class="text-lg font-semibold text-orange-700 mb-3">📅 Détails du compte</h3>
+            <ul class="text-gray-700 text-sm space-y-2">
+              <li><span class="font-medium">Date de création :</span> {{ user?.createdAt }}</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Modifier bouton -->
+        <div class="text-right">
+          <button class="inline-flex items-center gap-2 px-6 py-3 bg-orange-500 text-white font-semibold rounded-full shadow-md hover:bg-orange-600 transition">
+            ✏️ Modifier mes infos
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

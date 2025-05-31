@@ -1,0 +1,46 @@
+<div class="container mx-auto p-6">
+  <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Catégories de Produits</h1>
+
+  <!-- Boutons de tri -->
+  <div class="flex justify-center gap-4 mb-6">
+    <button class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300" (click)="sortBy('name')">
+      Trier par nom
+    </button>
+    <button class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300" (click)="sortBy('fournisseurName')">
+      Trier par fournisseur
+    </button>
+    <button class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300" (click)="sortBy('productCount')">
+      Trier par nombre de produits
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="text-center text-gray-600">Chargement...</div>
+
+  <!-- Liste des catégories -->
+  <div *ngIf="!isLoading && categories.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div *ngFor="let category of categories" class="bg-gradient-to-br from-white to-gray-100 shadow-lg rounded-xl p-6 border border-gray-200 hover:shadow-xl transition duration-200 relative">
+      <div class="flex justify-between items-start">
+        <div>
+          <h2 class="text-lg font-bold text-gray-800">{{ category.name }}</h2>
+          <p class="text-sm text-gray-500">ID: {{ category.id }}</p>
+        </div>
+        <button
+          class="text-red-500 hover:text-red-700"
+          (click)="deleteCategory(category.id)"
+          title="Supprimer"
+        >
+          🗑️
+        </button>
+      </div>
+      <div class="mt-4 text-sm text-gray-700 space-y-1">
+        <p><span class="font-medium">Fournisseur:</span> {{ category.fournisseurName }}</p>
+        <p><span class="font-medium">Produits:</span> {{ category.productCount }}</p>
+      </div>
+    </div>
+  </div>
+
+  <p *ngIf="!isLoading && categories.length === 0" class="text-gray-600 mt-6 text-center">
+    Aucune catégorie disponible.
+  </p>
+</div>

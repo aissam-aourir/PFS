@@ -25,4 +25,10 @@ export class OrderService extends AbstractCrudService<Order> {
   updateOrder(order: any): Observable<any> {
     return this.httpClient.put(`${this.baseUrl}/${order.id}`, order.status);
   }
+  //ajoute
+  getOrdersByUserId(clientId: string): Observable<Order[]> {
+    return this.httpClient.get<Order[]>(`${this.baseUrl}/client/${clientId}`);
+  }
+
+
 }

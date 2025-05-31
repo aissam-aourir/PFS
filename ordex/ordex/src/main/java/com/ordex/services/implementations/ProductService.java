@@ -63,5 +63,9 @@ public class ProductService implements IProductService {
         return productRepository.findByIsValidByAdminTrue();
     }
 
-
+    @Override
+    public List<Product> getByCategoryId(int categoryId) {
+        Long longCategoryId = Long.valueOf(categoryId);
+        return productRepository.findByCategoryId(longCategoryId);
+    }
 }

@@ -146,9 +146,10 @@
 
         <!-- Actions -->
         <div class="p-6 border-t border-gray-100 bg-gray-50 flex justify-end space-x-4">
-          <button class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors">
+          <button (click)="contactSupport()" class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors">
             Contacter le support
           </button>
+
           <button *ngIf="order.status === 'PENDING'" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors">
             Annuler la commande
           </button>

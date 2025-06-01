@@ -1,3 +1,30 @@
+<!-- Hero Section -->
+<section id="home" class="relative bg-gray-100 py-20 text-center">
+  <div class="max-w-4xl mx-auto px-6">
+    <h1 class="text-5xl md:text-6xl font-bold text-gray-800 mb-6">Bienvenue chez <span class="text-orange-500">Ordex</span></h1>
+    <p class="text-gray-600 text-lg mb-8">Votre marketplace préféré pour des produits de qualité supérieure.</p>
+    <button (click)="scrollToProducts()" class="bg-orange-500 text-white px-6 py-3 rounded-full hover:bg-orange-600 transition">Commencer vos achats</button>
+  </div>
+  <img src="../../../assets/photo-ecome.jpg" alt="Shopping" class="w-full max-h-[95vh] object-cover mt-10 rounded-lg shadow-md">
+</section>
+
+<!-- About Us Section -->
+<section id="about-ordex" class="py-20 px-6 md:px-20 bg-white">
+  <div class="flex flex-col md:flex-row items-center gap-10">
+    <div class="flex-1">
+      <img src-1 src="https://altaviawatch.com/wp-content/uploads/2022/09/Bricolage-1024x683.jpeg" alt="À propos d'Ordex" class="rounded-lg shadow-lg">
+    </div>
+    <div class="flex-1">
+      <h2 class="text-4xl font-bold text-gray-800 mb-6">À propos de <span class="text-orange-500">Ordex</span></h2>
+      <p class="text-gray-600 mb-4">Ordex est conçu pour simplifier votre expérience d'achat pour la construction.
+        Des briques et du béton à la peinture murale, en passant par les fournitures électriques et les essentiels de plomberie, nous mettons tous vos matériaux de construction à portée de main — avec un service de qualité supérieure et des prix compétitifs.</p>
+      <p class="text-gray-600">Nous sommes motivés par la fiabilité, l'efficacité et une passion pour vous aider à mieux construire. Explorez Ordex et transformez vos projets de construction et de rénovation en réalité !</p>
+      <button (click)="scrollToProducts()" class="mt-4 bg-blue-500 text-white px-6 py-3 rounded-full hover:bg-blue-600 transition">Voir nos produits</button>
+    </div>
+  </div>
+</section>
+
+<!-- Products Section -->
 <section id="products" class="py-20 px-6 md:px-20 bg-gray-100">
   <h2 class="text-4xl font-bold text-center text-gray-800 mb-10">
     Découvrez nos <span class="text-orange-500">Produits</span>
@@ -29,6 +56,7 @@
     </div>
   </div>
 
+  <!-- Modal pour les détails du produit -->
   <div *ngIf="selectedProduct" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-xl p-6 max-w-lg w-full mx-4">
       <div class="flex justify-between items-center mb-4">
@@ -45,4 +73,42 @@
       <p class="text-gray-600 text-sm mb-2">{{ selectedProduct.description }}</p>
       <p class="text-sm text-gray-500 mb-2">Catégorie : {{ selectedProduct.category?.name || 'N/A' }}</p>
       <p class="text-sm text-gray-500 mb-2">
-        Quantité en stock : <span class="text-green-600 font-bold">{{ selectedProduct.stock
+        Quantité en stock : <span class="text-green-600 font-bold">{{ selectedProduct.stock }}</span>
+      </p>
+      <p class="text-lg font-bold text-orange-500 mb-4">{{ selectedProduct.price | number : '1.2-2' }} MAD</p>
+      <button
+        (click)="addToCart(selectedProduct)"
+        [ngClass]="isInCart(selectedProduct.id!) ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-yellow-500 hover:bg-yellow-700 text-white'"
+        class="w-full p-3 rounded-lg flex items-center justify-center mb-2"
+      >
+        {{ isInCart(selectedProduct.id!) ? 'Ajouté au panier' : 'Ajouter au panier' }}
+        <i class="fas fa-shopping-cart ml-2"></i>
+      </button>
+      <button
+        (click)="closeProductDetails()"
+        class="w-full bg-gray-500 hover:bg-gray-600 text-white p-3 rounded-lg text-sm font-semibold transition"
+      >
+        Fermer
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Promotions / Testimonials Section -->
+<section class="py-20 px-6 md:px-20 bg-white">
+  <h2 class="text-4xl font-bold text-center text-gray-800 mb-10">Ce que nos <span class="text-orange-500">clients</span> disent</h2>
+
+  <div class="flex flex-col md:flex-row gap-6 justify-center">
+    <div class="bg-gray-100 p-6 rounded-lg shadow-md text-center">
+      <p class="italic text-gray-600 mb-4">"Ordex a rendu mon expérience d'achat si facile et agréable. J'adore !"</p>
+      <div class="text-orange-500 font-semibold">- Alice M.</div>
+    </div>
+    <div class="bg-gray-100 p-6 rounded-lg shadow-md text-center">
+      <p class="italic text-gray-600 mb-4">"Livraison rapide, excellents produits et un support incroyable. Fortement recommandé !"</p>
+      <div class="text-orange-500 font-semibold">- David L.</div>
+    </div>
+  </div>
+  <div class="text-center mt-8">
+    <button (click)="scrollToAboutUs()" class="bg-blue-500 text-white px-6 py-3 rounded-full hover:bg-blue-600 transition">En savoir plus sur nous</button>
+  </div>
+</section>

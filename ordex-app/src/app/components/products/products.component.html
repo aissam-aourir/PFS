@@ -1,10 +1,31 @@
 <div class="bg-white p-6 rounded-md shadow-md">
-  <div class="flex justify-between mb-4 w-full">
-    <input
-      type="text"
-      placeholder="Rechercher des produits..."
-      class="border border-gray-300 rounded-md px-4 py-2 w-1/3"
-    />
+  <!-- Barre supérieure sticky -->
+  <div class="flex justify-between mb-4 w-full sticky top-0 bg-white z-10 py-4 border-b border-gray-200">
+    <div class="flex space-x-4 w-2/3">
+      <input
+        type="text"
+        placeholder="Rechercher des produits..."
+        class="border border-gray-300 rounded-md px-4 py-2 w-1/2"
+        [(ngModel)]="searchQuery"
+        (input)="applyFilters()"
+      />
+      <select [(ngModel)]="selectedStatus" (change)="applyFilters()" class="border border-gray-300 rounded-md px-4 py-2">
+        <option value="">Tous les statuts</option>
+        <option value="true">Publié</option>
+        <option value="false">En attente</option>
+      </select>
+      <select [(ngModel)]="selectedCategory" (change)="applyFilters()" class="border border-gray-300 rounded-md px-4 py-2">
+        <option value="">Toutes les catégories</option>
+        <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+      </select>
+      <input
+        type="number"
+        placeholder="Stock minimum"
+        [(ngModel)]="minStock"
+        (input)="applyFilters()"
+        class="border border-gray-300 rounded-md px-4 py-2 w-1/4"
+      />
+    </div>
     <div>
       <button (click)="openCategoryModal()" class="bg-yellow-500 hover:bg-yellow-800 text-white px-4 py-2 rounded-md mr-4">
         Catégories
@@ -23,7 +44,6 @@
     (close)="closeModal()">
   </app-new-product-modal>
 
-  <!-- Modal de modification -->
   <app-edit-product-modal
     *ngIf="isEditModalOpen"
     [isOpen]="isEditModalOpen"
@@ -80,9 +100,11 @@
           <button (click)="openEditModal(product)" class="hover:text-green-600 text-green-500 p-2 rounded-md">
             <i class="fas fa-edit text-xl"></i>
           </button>
-<!--          <button (click)="deleteProduct(product.id)" class="hover:text-red-600 text-red-500 p-2 rounded-md">-->
-<!--            <i class="fas fa-trash-alt text-xl"></i>-->
-<!--          </button>-->
+          <!--
+          <button (click)="deleteProduct(product.id)" class="hover:text-red-600 text-red-500 p-2 rounded-md">
+            <i class="fas fa-trash-alt text-xl"></i>
+          </button>
+          -->
         </td>
       </tr>
       </tbody>

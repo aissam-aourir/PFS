@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Product } from '../../models/product';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms'; // Added for ngModel
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Category } from '../../models/category';
-import { ProductService } from '../../services/product.service';  // Import ProductService
+import { ProductService } from '../../services/product.service';
 import { CategoryService } from '../../services/category.service';
 import { NewProductModalComponent } from './new-product-modal/new-product-modal.component';
 import { EditProductModalComponent } from './edit-product-modal/edit-product-modal.component';
@@ -14,20 +15,20 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, NewProductModalComponent,EditProductModalComponent,CategoryModalComponent,ToastrModule],
+  imports: [CommonModule, FormsModule, NewProductModalComponent, EditProductModalComponent, CategoryModalComponent, ToastrModule],
   templateUrl: './products.component.html'
 })
 export class ProductsComponent implements OnInit {
-
   constructor(
     private fb: FormBuilder,
-    private productService: ProductService,  // Inject ProductService
+    private productService: ProductService,
     private categoryService: CategoryService,
-     private toastr: ToastrService,
-     private authService:AuthService
+    private toastr: ToastrService,
+    private authService: AuthService
   ) {}
 
   products: Product[] = [];
+  filteredProducts: Product[] = []; // Store filtered products
   categories: Category[] = [];
   currentPage = 1;
   itemsPerPage = 6;
@@ -37,7 +38,11 @@ export class ProductsComponent implements OnInit {
   productToEdit?: Product;
   supplierId!: string;
 
-
+  // Filter properties
+  searchQuery: string = '';
+  selectedStatus: string = '';
+  selectedCategory: string = '';
+  minStock: number | null = null;
 
   ngOnInit(): void {
     if (this.authService.userId) {
@@ -49,16 +54,16 @@ export class ProductsComponent implements OnInit {
     this.loadCategories();
   }
 
-
   loadProductsBySupplier(supplierId: string): void {
-    console.log(supplierId);
     const supplierIdNum = Number(supplierId);
     this.productService.getProductsBySupplier(supplierIdNum).subscribe({
       next: (data) => {
         this.products = data;
+        this.filteredProducts = data; // Initialize filteredProducts
+        this.applyFilters(); // Apply any default filters (optional)
       },
       error: (err) => {
-        this.toastr.error("No products found","Warning", {
+        this.toastr.error("No products found", "Warning", {
           timeOut: 3000,
           positionClass: 'toast-top-right',
           progressBar: true,
@@ -68,24 +73,38 @@ export class ProductsComponent implements OnInit {
     });
   }
 
-  // loadProducts(): void {
-  //   this.productService.getAll().subscribe({
-  //     next: (data) => {
-  //       this.products = data; // Assign the products fetched from the server to the local array
-  //     },
-  //     error: (err) => {
-  //       console.error('Error loading products', err);  // Handle any errors
-  //     }
-  //   });
-  // }
   loadCategories(): void {
     this.categoryService.getAll().subscribe({
       next: (data) => {
-        this.categories = data; // Assign the products fetched from the server to the local array
+        this.categories = data;
       },
       error: (err) => {
-        console.error('Error loading products', err);  // Handle any errors
+        console.error('Error loading categories', err);
       }
+    });
+  }
+
+  applyFilters(): void {
+    this.currentPage = 1; // Reset to first page on filter change
+    this.filteredProducts = this.products.filter(product => {
+      const matchesSearch = this.searchQuery
+        ? product.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        product.description.toLowerCase().includes(this.searchQuery.toLowerCase())
+        : true;
+
+      const matchesStatus = this.selectedStatus
+        ? product.isValidByAdmin.toString() === this.selectedStatus
+        : true;
+
+      const matchesCategory = this.selectedCategory
+        ? product.category.id.toString() === this.selectedCategory
+        : true;
+
+      const matchesStock = this.minStock !== null
+        ? product.stock >= this.minStock
+        : true;
+
+      return matchesSearch && matchesStatus && matchesCategory && matchesStock;
     });
   }
 
@@ -106,21 +125,17 @@ export class ProductsComponent implements OnInit {
     this.isEditModalOpen = false;
   }
 
+  openCategoryModal() {
+    this.isCategoryModalOpen = true;
+  }
 
-
-openCategoryModal() {
-  this.isCategoryModalOpen = true;
-}
-
-closeCategoryModal() {
-  this.isCategoryModalOpen = false;
-}
-
+  closeCategoryModal() {
+    this.isCategoryModalOpen = false;
+  }
 
   addProduct(product: Product): void {
     this.productService.create(product).subscribe({
       next: (newProduct) => {
-        console.log('New Product Created:', newProduct);
         this.toastr.success("New Product has been sent to the Admin to validate", "Request sent", {
           timeOut: 3000,
           positionClass: 'toast-top-right',
@@ -128,10 +143,10 @@ closeCategoryModal() {
           toastClass: 'ngx-toastr toast toast-success rounded shadow-sm w-72',
         });
         this.loadProductsBySupplier(this.supplierId);
-        this.closeModal();  // Close the modal after adding the product
+        this.closeModal();
       },
       error: (err) => {
-        console.error('Error creating product', err);  // Handle any errors
+        console.error('Error creating product', err);
         this.toastr.error(err, "Error", {
           timeOut: 3000,
           positionClass: 'toast-top-right',
@@ -159,7 +174,7 @@ closeCategoryModal() {
         console.log('Product deleted');
       },
       error: (err) => {
-        console.error('Error deleting product', err);  // Handle any errors
+        console.error('Error deleting product', err);
       }
     });
   }
@@ -169,7 +184,7 @@ closeCategoryModal() {
       next: (updated) => {
         console.log('Product Updated:', updated);
         this.loadProductsBySupplier(this.supplierId);
-        this.closeModal();
+        this.closeEditModal();
       },
       error: (err) => {
         console.error('Error updating product', err);
@@ -177,48 +192,45 @@ closeCategoryModal() {
     });
   }
 
-
-
-addCategory(name: string): void {
-  const newCategory: Partial<Category> = { name };
-  this.categoryService.create(newCategory).subscribe({
-    next: () => {
-      this.loadCategories(); // Refresh categories list
-    },
-    error: (err) => {
-      console.error('Error adding category', err);
-    }
-  });
-}
-
-deleteCategory(id: number): void {
-  const confirmDelete = confirm('Are you sure you want to delete this category?');
-  if (!confirmDelete) return;
-
-  this.categoryService.delete(id).subscribe({
-    next: () => {
-      console.log('Category deleted successfully.');
-      this.loadCategories(); // Refresh after delete
-    },
-    error: (err) => {
-      if (err.status === 400 || err.status === 409) {
-        alert('❗ An unexpected error occurred while deleting the category.');
-      } else {
-        alert('❗ Cannot delete this category because it has associated products. Please delete the products first.');
+  addCategory(name: string): void {
+    const newCategory: Partial<Category> = { name };
+    this.categoryService.create(newCategory).subscribe({
+      next: () => {
+        this.loadCategories();
+      },
+      error: (err) => {
+        console.error('Error adding category', err);
       }
-      console.error('Error deleting category', err);
-    }
-  });
-}
+    });
+  }
 
+  deleteCategory(id: number): void {
+    const confirmDelete = confirm('Are you sure you want to delete this category?');
+    if (!confirmDelete) return;
+
+    this.categoryService.delete(id).subscribe({
+      next: () => {
+        console.log('Category deleted successfully.');
+        this.loadCategories();
+      },
+      error: (err) => {
+        if (err.status === 400 || err.status === 409) {
+          alert('❗ An unexpected error occurred while deleting the category.');
+        } else {
+          alert('❗ Cannot delete this category because it has associated products. Please delete the products first.');
+        }
+        console.error('Error deleting category', err);
+      }
+    });
+  }
 
   get paginatedProducts(): Product[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    return this.products.slice(startIndex, startIndex + this.itemsPerPage);
+    return this.filteredProducts.slice(startIndex, startIndex + this.itemsPerPage);
   }
 
   get totalPages(): number {
-    return Math.ceil(this.products.length / this.itemsPerPage);
+    return Math.ceil(this.filteredProducts.length / this.itemsPerPage);
   }
 
   goToPage(page: number) {

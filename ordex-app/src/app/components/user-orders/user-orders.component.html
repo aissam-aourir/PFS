@@ -96,7 +96,7 @@
                   }">
               {{ order.status === 'COMPLETED' ? 'Terminé' : order.status === 'PENDING' ? 'En attente' : 'Annulé' }}
             </span>
-            <button class="text-sm text-orange-600 hover:text-orange-700 font-medium">Voir les détails</button>
+<!--            <button class="text-sm text-orange-600 hover:text-orange-700 font-medium">Voir les détails</button>-->
           </div>
         </div>
 
@@ -150,9 +150,9 @@
             Contacter le support
           </button>
 
-          <button *ngIf="order.status === 'PENDING'" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors">
-            Annuler la commande
-          </button>
+<!--          <button *ngIf="order.status === 'PENDING'" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors">-->
+<!--            Annuler la commande-->
+<!--          </button>-->
         </div>
       </div>
     </div>

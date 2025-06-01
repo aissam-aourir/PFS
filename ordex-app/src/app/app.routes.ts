@@ -13,6 +13,7 @@ import { ProductsComponent } from './components/products/products.component';
 import { OrdersComponent } from './components/orders/orders.component';
 // import { DeliveriesComponent } from './components/deliveries/deliveries.component';
 import { CategoriesComponent } from './components/categories/categories.component';
+import { CreatorsComponent } from './components/creators/creators.component';
 
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ClientsComponent } from './components/clients/clients.component';
@@ -35,8 +36,10 @@ const homeRoutes: Routes = [
   { path: 'checkout', component: CheckoutPageComponent },
   { path: 'my-orders', component: UserOrdersComponent },
   { path: 'profile', component: ProfileComponent },
-  { path: 'contact', component: ContactComponent } // Added contact route
+  { path: 'contact', component: ContactComponent },
+  { path: 'creators', component: CreatorsComponent } // ✅ Nouvelle route
 ];
+
 
 // Supplier panel routes
 const supplierRoutes: Routes = [
@@ -47,7 +50,7 @@ const supplierRoutes: Routes = [
 
 // Admin panel routes
 const adminRoutes: Routes = [
-  { path: '', redirectTo: 'products', pathMatch: 'full' },
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'products', component: AdminProductsComponent },
   { path: 'orders', component: OrdersComponent },

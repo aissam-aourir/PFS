@@ -68,18 +68,22 @@
       <img [src]="product.imageURL" [alt]="product.name" class="h-40 w-40 object-cover mb-4 rounded-md">
       <h2 class="text-lg font-semibold mb-2">{{ product.name }}</h2>
       <p class="text-gray-700 font-bold mb-4">{{ product.price }} MAD</p>
-
-      <!-- Bouton Ajouter au panier -->
-      <button
-        (click)="addToCart(product)"
-        [ngClass]="isInCart(product.id!) ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-yellow-500 hover:bg-yellow-700 text-white'"
-        class="p-3 rounded-full flex items-center justify-center mb-2"
-      >
-        {{ isInCart(product.id!) ? 'Ajouté au panier' : 'Ajouter au panier' }}
-        <i class="fas fa-shopping-cart ml-2"></i>
-      </button>
-
-      <!-- Bouton Détails -->
+      <div *ngIf="product.stock > 0; else outOfStock">
+        <button
+          (click)="addToCart(product)"
+          [ngClass]="isInCart(product.id!) ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-yellow-500 hover:bg-yellow-700 text-white'"
+          class="p-3 rounded-full flex items-center justify-center mb-2"
+        >
+          {{ isInCart(product.id!) ? 'Ajouté au panier' : 'Ajouter au panier' }}
+          <i class="fas fa-shopping-cart ml-2"></i>
+        </button>
+      </div>
+      <ng-template #outOfStock>
+        <div class="bg-red-100 text-red-600 font-semibold p-2 rounded-lg flex items-center justify-center mb-2 w-full">
+          <i class="fas fa-exclamation-triangle mr-2"></i>
+          Indisponible
+        </div>
+      </ng-template>
       <button
         (click)="showProductDetails(product)"
         class="p-3 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center"
@@ -105,18 +109,26 @@
       />
       <p class="text-gray-600 text-sm mb-2">{{ selectedProduct.description }}</p>
       <p class="text-sm text-gray-500 mb-2">Catégorie : {{ selectedProduct.category?.name || 'N/A' }}</p>
-      <p class="text-sm text-gray-500 mb-2">Quantité en stock :
-        <span class="text-green-600 font-bold">{{ selectedProduct.stock }}</span>
+      <p *ngIf="selectedProduct.stock > 0" class="text-sm text-gray-500 mb-2">
+        Quantité en stock : <span class="text-green-600 font-bold">{{ selectedProduct.stock }}</span>
       </p>
       <p class="text-lg font-bold text-orange-500 mb-4">{{ selectedProduct.price | number : '1.2-2' }} MAD</p>
-      <button
-        (click)="addToCart(selectedProduct)"
-        [ngClass]="isInCart(selectedProduct.id!) ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-yellow-500 hover:bg-yellow-700 text-white'"
-        class="w-full p-3 rounded-lg flex items-center justify-center mb-2"
-      >
-        {{ isInCart(selectedProduct.id!) ? 'Ajouté au panier' : 'Ajouter au panier' }}
-        <i class="fas fa-shopping-cart ml-2"></i>
-      </button>
+      <div *ngIf="selectedProduct.stock > 0; else outOfStockModal">
+        <button
+          (click)="addToCart(selectedProduct)"
+          [ngClass]="isInCart(selectedProduct.id!) ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-yellow-500 hover:bg-yellow-700 text-white'"
+          class="w-full p-3 rounded-lg flex items-center justify-center mb-2"
+        >
+          {{ isInCart(selectedProduct.id!) ? 'Ajouté au panier' : 'Ajouter au panier' }}
+          <i class="fas fa-shopping-cart ml-2"></i>
+        </button>
+      </div>
+      <ng-template #outOfStockModal>
+        <div class="bg-red-100 text-red-600 font-semibold p-2 rounded-lg flex items-center justify-center mb-2 w-full">
+          <i class="fas fa-exclamation-triangle mr-2"></i>
+          Indisponible
+        </div>
+      </ng-template>
       <button
         (click)="closeProductDetails()"
         class="w-full bg-gray-500 hover:bg-gray-600 text-white p-3 rounded-lg text-sm font-semibold transition"

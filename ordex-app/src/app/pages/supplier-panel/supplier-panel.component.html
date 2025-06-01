@@ -8,19 +8,19 @@
 
     <!-- Supplier Username Display -->
     <div class="text-center text-lg font-semibold text-gray-200 mb-8">
-      <p>{{ username }}</p>
+      <p>{{ email }}</p>
     </div>
 
     <!-- Sidebar Menu -->
     <ul class="space-y-4 flex-1">
       <li>
         <a routerLink="dashboard" routerLinkActive="text-yellow-400 bg-gray-700" class="block px-4 py-2 rounded-md hover:bg-gray-700">
-          Dashboard
+          Tableau de bord
         </a>
       </li>
       <li>
         <a routerLink="products" routerLinkActive="text-yellow-400 bg-gray-700" class="block px-4 py-2 rounded-md hover:bg-gray-700">
-          Products
+          Produits
         </a>
       </li>
     </ul>
@@ -29,7 +29,7 @@
     <div class="mt-auto text-center">
       <button (click)="logout()" class="w-full bg-red-700 hover:bg-red-800 text-white py-2 rounded-md flex items-center justify-center space-x-2">
         <i class="fas fa-sign-out-alt"></i>
-        <span>Log Out</span>
+        <span>Deconnexion</span>
       </button>
     </div>
 

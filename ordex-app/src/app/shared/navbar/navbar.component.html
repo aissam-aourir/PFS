@@ -2,7 +2,10 @@
   <ul class="flex space-x-6 text-gray-700 font-medium items-center">
     <img src="../../../assets/logo2.png" alt="Logo" class="h-16 mr-8 ml-5">
     <li><a routerLink="/home/main" class="hover:text-orange-500">Accueil</a></li>
-    <li class="hover:text-orange-500">À propos</li>
+    <a routerLink="/home/creators">
+      <li class="hover:text-orange-500 cursor-pointer">À propos</li>
+    </a>
+
     <li><a routerLink="/home/products" class="hover:text-orange-500">Nos produits</a></li>
     <li><a routerLink="/home/contact" class="hover:text-orange-500">Contact</a></li>
   </ul>
@@ -63,22 +66,18 @@
     </ng-container>
 
     <ng-template #guestLinks>
-      <li><a routerLink="/login" class="text-orange-500 hover:underline">Connexion</a></li>
-      <li><a routerLink="/register" class="text-orange-500 hover:underline">Inscription</a></li>
+      <li>
+        <a routerLink="/login" class="text-orange-500 flex flex-col items-center space-y-1 hover:underline hover:scale-110 hover:text-yellow-400 transition-transform duration-300">
+          <span>Connexion</span>
+          <i class="fas fa-sign-in-alt text-lg"></i>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/register" class="text-orange-500 flex flex-col items-center space-y-1 hover:underline hover:scale-110 hover:text-yellow-400 transition-transform duration-300">
+          <span>Inscription</span>
+          <i class="fas fa-user-plus text-lg"></i>
+        </a>
+      </li>
     </ng-template>
   </ul>
 </nav>
-
-<style>
-  .interactive-phrase {
-    font-size: 0.875rem;
-    color: white;
-    transition: transform 0.3s ease, color 0.3s ease;
-    text-align: center;
-  }
-
-  .interactive-phrase:hover {
-    transform: scale(1.1);
-    color: #facc15; /* Jaune doré pour un effet visuel */
-  }
-</style>

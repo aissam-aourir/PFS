@@ -15,9 +15,11 @@ export class SupplierPanelComponent {
   get username(): string {
     return this.authService.username || 'Supplier';
   }
-
+  get email(): string {
+    return this.authService.email;
+  }
   logout(): void {
     this.authService.logout();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/home/main']);
   }
 }

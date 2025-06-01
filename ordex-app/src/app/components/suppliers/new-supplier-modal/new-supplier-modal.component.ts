@@ -20,8 +20,7 @@ export class NewSupplierModalComponent {
     this.supplierForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required], // ✅ added password
-      email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]] // Example pattern for 10-digit phone number
+      email: ['', [Validators.required, Validators.email]]
     });
   }
 

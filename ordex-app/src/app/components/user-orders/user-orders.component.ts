@@ -5,7 +5,7 @@ import { Order } from '../../models/order';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-user-orders',
   standalone: true,
@@ -20,6 +20,7 @@ export class UserOrdersComponent implements OnInit {
   totalSort: string = 'none';   // ici on va faire tri par montant total
 
   constructor(
+    private router : Router,
     private orderService: OrderService,
     private authService: AuthService
   ) {}
@@ -103,5 +104,8 @@ export class UserOrdersComponent implements OnInit {
 
   handleImageError(event: Event, productName: string) {
     console.error(`Erreur de chargement de l'image pour le produit ${productName}:`, (event.target as HTMLImageElement).src);
+  }
+  contactSupport(): void {
+    this.router.navigate(['/home/contact']).catch(err => console.error('Erreur de navigation :', err));
   }
 }

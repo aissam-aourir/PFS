@@ -103,7 +103,7 @@ export class AuthService {
     this.email = null;
     this.accessToken = '';
     localStorage.removeItem('access-token');
-    this.router.navigate(['/main']);
+    this.router.navigate(['/home/main']);
   }
 
   hasRole(role: string): boolean {

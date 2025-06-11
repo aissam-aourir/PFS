@@ -6,6 +6,7 @@ import com.ordex.entities.Product;
 import com.ordex.helpers.OrderListResponseDTO;
 import com.ordex.helpers.OrderResponseDTO;
 import com.ordex.repository.OrderProductRepository;
+import com.ordex.repository.ProductRepository;
 import com.ordex.security.entities.Utilisateur;
 import com.ordex.security.service.AccountServiceImpl;
 import com.ordex.services.interfaces.*;
@@ -37,6 +38,7 @@ public class OrderController {
     private final AccountServiceImpl accountService;
     private final EmailServiceImpl emailService;
     private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
 
     @PostMapping
     public ResponseEntity<?> placeOrder(@RequestBody OrderResponseDTO dto) {
@@ -186,6 +188,17 @@ public class OrderController {
                 System.out.println("Order completed successfully.");
                 emailService.sendOrderAccepted(email, response);
             } else if (status.equals("Canceled")) {
+                //si la valeur de status de la commande est Canceled , on va ajouter au stock de sproduits concernes dans la commande les valeurs demandes pour empecher
+                //on va ajouter pour stock d'un tel produit de la commande la quantite qu'on a demande
+                //par exemple on a commande 12 pieces d'un produits x ,donc on a diminuer sa quantite de stock par 12
+                //mais apres on a annule la commande, donc on va ajouter 12 pieces au stock de ce produit x
+                //et cela va se faire sur tous les produits d'une telle commande
+                for(OrderProduct orderProduct : order.getOrderProducts()) {
+                    Product product = productRepository.findById(orderProduct.getProduct().getId())
+                            .orElseThrow(() -> new IllegalArgumentException("Product not found: ID " + orderProduct.getProduct().getId()));
+                    product.setStock(product.getStock() + orderProduct.getQuantity().intValue());
+                    productRepository.save(product);
+                }
                 System.out.println("Order canceled successfully.");
                 emailService.sendOrderRejected(email, response);
             }

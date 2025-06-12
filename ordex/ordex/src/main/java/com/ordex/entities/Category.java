@@ -1,5 +1,4 @@
 package com.ordex.entities;
-
 import com.ordex.security.entities.Utilisateur;
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,10 +8,8 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @Entity
-
 @Table(name = "categories")
 public class Category {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,4 +21,7 @@ public class Category {
     // pour mentionner le supplier qu'il a cree une telle category
     @OneToOne
     private Utilisateur user;
+//    @ManyToOne
+//    @JoinColumn(name = "user_user_id", nullable = true) // Clé étrangère vers users.userId
+//    private Utilisateur user;
 }

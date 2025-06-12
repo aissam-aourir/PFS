@@ -1,0 +1,64 @@
+<div class="min-h-screen bg-gray-100 p-6">
+  <!-- Profile Section -->
+  <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-xl shadow-xl p-6 mb-6 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+    <div class="flex-1">
+      <h2 class="text-3xl font-bold mb-2">Bienvenue, {{ username }}</h2>
+      <p class="text-blue-100 mb-1">Email: {{ email }}</p>
+      <p class="text-blue-200 text-sm">Membre depuis: {{ createdAt | date:'medium' }}</p>
+    </div>
+    <div class="flex-shrink-0">
+      <button (click)="openProfileModal()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">Modifier Profil</button>
+    </div>
+  </div>
+
+  <!-- Dashboard Summary -->
+  <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+      Tableau de Bord Fournisseur
+      <span *ngIf="isLoading" class="ml-3 inline-block h-5 w-5 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
+    </h2>
+
+    <!-- Personal Information Section -->
+    <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+      <h3 class="text-lg font-medium text-gray-700 mb-2">Informations Personnelles</h3>
+      <p><strong>Nom d'utilisateur :</strong> {{ username }}</p>
+      <p><strong>Email :</strong> {{ email }}</p>
+      <p><strong>Inscrit depuis :</strong> {{ createdAt | date:'medium' }}</p>
+      <p><strong>Téléphone :</strong> {{ phone || 'Non spécifié' }}</p>
+    </div>
+
+    <!-- Category Section -->
+    <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+      <h3 class="text-lg font-medium text-gray-700 mb-2">Ma Catégorie</h3>
+      <p *ngIf="category" class="text-gray-800"><strong>Nom :</strong> {{ category.name }}</p>
+      <p *ngIf="!category" class="text-red-500">Aucune catégorie créée.</p>
+      <button (click)="openCategoryModal()" class="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm">Créer/Modifier Catégorie</button>
+    </div>
+
+    <!-- Products Summary -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+      <div class="p-4 bg-green-50 rounded-lg text-center hover:bg-green-100 transition">
+        <h3 class="text-lg font-medium text-gray-700">Produits Total</h3>
+        <p class="text-3xl font-bold text-green-600">{{ productsCount }}</p>
+      </div>
+      <div class="p-4 bg-purple-50 rounded-lg text-center hover:bg-purple-100 transition">
+        <h3 class="text-lg font-medium text-gray-700">Produits en Attente</h3>
+        <p class="text-3xl font-bold text-purple-600">{{ pendingProductsCount }}</p>
+      </div>
+      <div class="p-4 bg-yellow-50 rounded-lg text-center hover:bg-yellow-100 transition" *ngIf="category">
+        <h3 class="text-lg font-medium text-gray-700">Produits dans Catégorie</h3>
+        <p class="text-3xl font-bold text-yellow-600">{{ categoryProductsCount }}</p>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-end space-x-4">
+      <button (click)="refreshData()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">Rafraîchir</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mt-6 text-center text-gray-500 text-sm">
+    <p>Mis à jour le {{ currentDate | date:'full' }} | © 2025 Ordex. Tous droits réservés.</p>
+  </div>
+</div>

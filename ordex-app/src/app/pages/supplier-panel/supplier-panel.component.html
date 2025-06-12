@@ -1,6 +1,6 @@
-<div class="flex h-screen">
+<div class="flex min-h-screen">
   <!-- Sidebar -->
-  <nav class="w-64 bg-gray-800 text-white p-5 flex flex-col">
+  <nav class="w-64 bg-gray-800 text-white p-5 flex flex-col fixed h-full top-0 left-0 z-20">
     <!-- Logo -->
     <div class="flex items-center justify-center mb-6">
       <img src="../../../assets/logo2.png" alt="Logo" class="h-20">
@@ -13,14 +13,14 @@
 
     <!-- Sidebar Menu -->
     <ul class="space-y-4 flex-1">
-<!--      <li>-->
-<!--        <a routerLink="dashboard" routerLinkActive="text-yellow-400 bg-gray-700" class="block px-4 py-2 rounded-md hover:bg-gray-700">-->
-<!--          Tableau de bord-->
-<!--        </a>-->
-<!--      </li>-->
+      <li>
+        <a routerLink="dashboard" routerLinkActive="text-yellow-400 bg-gray-700" class="block px-4 py-2 rounded-md hover:bg-gray-700">
+          Tableau de bord
+        </a>
+      </li>
       <li>
         <a routerLink="products" routerLinkActive="text-yellow-400 bg-gray-700" class="block px-4 py-2 rounded-md hover:bg-gray-700">
-          Tableau de bord
+          Produits
         </a>
       </li>
     </ul>
@@ -40,7 +40,7 @@
   </nav>
 
   <!-- Main Content Area -->
-  <div class="flex-1 bg-gray-100 p-6">
+  <div class="flex-1 bg-gray-100 p-6 ml-64"> <!-- ml-64 pour compenser la largeur de la sidebar (w-64) -->
     <router-outlet></router-outlet>
   </div>
 </div>

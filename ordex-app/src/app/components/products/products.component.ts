@@ -192,14 +192,17 @@ export class ProductsComponent implements OnInit {
     });
   }
 
-  addCategory(name: string): void {
+  // Dans products.component.ts, modifier uniquement la méthode addCategory
+  addCategory({ name, supplierId }: { name: string, supplierId: string }): void {
     const newCategory: Partial<Category> = { name };
-    this.categoryService.create(newCategory).subscribe({
+    this.categoryService.createWithSupplier(newCategory, supplierId).subscribe({
       next: () => {
+        this.toastr.success("Catégorie ajoutée avec succès", "Succès");
         this.loadCategories();
       },
       error: (err) => {
-        console.error('Error adding category', err);
+        console.error('Erreur lors de l\'ajout de la catégorie', err);
+        this.toastr.error("Erreur lors de l'ajout de la catégorie", "Erreur");
       }
     });
   }

@@ -4,6 +4,7 @@ import com.ordex.entities.Category;
 import com.ordex.helpers.CategoryDetailsDTO;
 import com.ordex.repository.CategoryRepository;
 import com.ordex.repository.ProductRepository;
+import com.ordex.security.entities.Utilisateur;
 import com.ordex.security.repository.UtilisateurRepository;
 import com.ordex.services.interfaces.ICategoryService;
 import lombok.RequiredArgsConstructor;
@@ -67,5 +68,23 @@ public class CategoryService implements ICategoryService {
             dto.setProductCount(productRepository.countByCategoryId(category.getId()));
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public Category createWithSupplier(Category category, String supplierId) {
+        Utilisateur supplier = utilisateurRepository.findById(Long.valueOf(supplierId))
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé pour l'ID: " + supplierId));
+        category.setUser(supplier);
+        System.out.println("Creating category with supplier: " + supplier.getUsername());
+        System.out.println("Category details: " + category.getName() + ", Supplier ID: " + supplierId);
+        // Set the supplier to the category
+        return categoryRepository.save(category);
+    }
+
+    @Override
+    public List<Category> getCategoriesBySupplier(Long supplierId) {
+        return categoryRepository.findAll().stream()
+                .filter(category -> category.getUser() != null && category.getUser().getUserId().equals(supplierId))
+                .collect(Collectors.toList());
     }
 }

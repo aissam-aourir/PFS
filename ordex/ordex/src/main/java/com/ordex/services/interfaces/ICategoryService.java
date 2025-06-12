@@ -5,10 +5,8 @@ import com.ordex.helpers.CategoryDetailsDTO;
 
 import java.util.List;
 
-public interface ICategoryService extends ICrudBaseService<Category, Long>{
-    // Add extra methods specific to Category if needed
-    //retourner un le nombre de sproduits par category
-//    Long countProductsByCategoryId(int categoryId);
-//une methdoede getCategoryDetails
-     List<CategoryDetailsDTO> getAllCategoryDetails();
+public interface ICategoryService extends ICrudBaseService<Category, Long> {
+    List<CategoryDetailsDTO> getAllCategoryDetails();
+    Category createWithSupplier(Category category, String supplierId);
+    public List<Category> getCategoriesBySupplier(Long supplierId);
 }

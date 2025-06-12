@@ -95,7 +95,7 @@ public class SecurityController {
             if (user.isBlocked()) {
                 return ResponseEntity.status(403).body(Map.of("error", "User is blocked"));
             }
-            this.emailService.sendLoginNotification(user.getEmail(),user.getUsername());
+//            this.emailService.sendLoginNotification(user.getEmail(),user.getUsername());
             String jwt = jwtService.generateToken(authentication, user);
 
             return ResponseEntity.ok(Map.of("access-token", jwt));

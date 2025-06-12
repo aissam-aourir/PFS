@@ -11,10 +11,8 @@ import { SupplierPanelComponent } from './pages/supplier-panel/supplier-panel.co
 import { AdminPanelComponent } from './pages/admin-panel/admin-panel.component';
 import { ProductsComponent } from './components/products/products.component';
 import { OrdersComponent } from './components/orders/orders.component';
-// import { DeliveriesComponent } from './components/deliveries/deliveries.component';
 import { CategoriesComponent } from './components/categories/categories.component';
 import { CreatorsComponent } from './components/creators/creators.component';
-
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ClientsComponent } from './components/clients/clients.component';
 import { SuppliersComponent } from './components/suppliers/suppliers.component';
@@ -25,7 +23,8 @@ import { CheckoutPageComponent } from './pages/checkout/checkout.component';
 import { AdminProductsComponent } from './components/admin-products/admin-products.component';
 import { UserOrdersComponent } from './components/user-orders/user-orders.component';
 import { ProfileComponent } from './components/profile/profile.component';
-import { ContactComponent } from './components/contact/contact.component'; // Added import for ContactComponent
+import { ContactComponent } from './components/contact/contact.component';
+import { DashboardsupplierComponent } from './components/dashboardsupplier/dashboardsupplier.component';
 
 // Home routes
 const homeRoutes: Routes = [
@@ -37,15 +36,15 @@ const homeRoutes: Routes = [
   { path: 'my-orders', component: UserOrdersComponent },
   { path: 'profile', component: ProfileComponent },
   { path: 'contact', component: ContactComponent },
-  { path: 'creators', component: CreatorsComponent } // ✅ Nouvelle route
+  { path: 'creators', component: CreatorsComponent }
 ];
-
 
 // Supplier panel routes
 const supplierRoutes: Routes = [
   { path: '', redirectTo: 'products', pathMatch: 'full' },
-  { path: 'products', component: ProductsComponent },
-  { path: 'dashboard', component: DashboardComponent }
+  { path: 'products', component: ProductsComponent }
+  ,
+  { path: 'dashboard', component: DashboardsupplierComponent }
 ];
 
 // Admin panel routes
@@ -54,7 +53,6 @@ const adminRoutes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'products', component: AdminProductsComponent },
   { path: 'orders', component: OrdersComponent },
-  // { path: 'deliveries', component: DeliveriesComponent },
   { path: 'categories', component: CategoriesComponent },
   { path: 'clients', component: ClientsComponent },
   { path: 'suppliers', component: SuppliersComponent }
